@@ -27,4 +27,9 @@ public class PortalController {
         }
         return "index";
     }
+
+    @RequestMapping(value = "/graphiql", method = RequestMethod.GET)
+    public String graphiql() {
+        return "graphiql";
+    }
 }

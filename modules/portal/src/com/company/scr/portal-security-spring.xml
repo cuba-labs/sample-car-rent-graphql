@@ -11,6 +11,7 @@
 
     <!-- REST-API has separate spring-security configuration -->
     <http pattern="/resources/**" security="none"/>
+    <http pattern="/graphiql" security="none"/>
 
     <http auto-config="true"
           use-expressions="true"
