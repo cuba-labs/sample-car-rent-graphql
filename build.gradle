@@ -56,6 +56,7 @@ configure([globalModule, coreModule, guiModule, webModule, portalModule]) {
 
     dependencies {
         testCompile('junit:junit:4.12')
+        compile('com.graphql-java:graphql-java-spring-webmvc:2020-07-12T23-24-35-c6606f6');
     }
 
     task sourceJar(type: Jar) {
