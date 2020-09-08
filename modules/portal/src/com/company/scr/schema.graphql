@@ -1,0 +1,27 @@
+schema {
+  query: Query
+}
+
+# Main query type for fetching data from tables
+type Query {
+  # Get list of users from corresponding table
+  users(id: Int, nickname: String): [User],
+  # Get list of roles from corresponding table
+  roles(id: Int, name: String): [Role]
+}
+
+type User {
+  id: ID!,
+  name: String!,
+  firstName: String!,
+  lastName: String!,
+  middleName: String!,
+  roles(id: Int, name: String): [Role]
+}
+
+type Role {
+  id: ID!,
+  name: String!,
+  description: String!,
+  users(id: Int, nickname: String): [User]
+}

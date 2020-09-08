@@ -24,4 +24,7 @@
             </map>
         </property>
     </bean>
+
+    <bean class="com.company.scr.portal.graphql.GraphqlServiceBean" name="graphqlServiceBean"/>
+    <bean class="com.company.scr.portal.graphql.GraphqlDataFetcher" name="graphqlDataFetcher"/>
 </beans>
