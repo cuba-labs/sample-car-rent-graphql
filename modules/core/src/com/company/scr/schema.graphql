@@ -4,24 +4,17 @@ schema {
 
 # Main query type for fetching data from tables
 type Query {
-  # Get list of users from corresponding table
-  users(id: Int, nickname: String): [User],
-  # Get list of roles from corresponding table
-  roles(id: Int, name: String): [Role]
+  cars: [Car]
 }
 
-type User {
+type Car {
   id: ID!,
-  name: String!,
-  firstName: String!,
-  lastName: String!,
-  middleName: String!,
-  roles(id: Int, name: String): [Role]
+  regNumber: String
+  garage: Garage
 }
 
-type Role {
+type Garage {
   id: ID!,
-  name: String!,
-  description: String!,
-  users(id: Int, nickname: String): [User]
+  name: String,
+  cars: [Car]
 }

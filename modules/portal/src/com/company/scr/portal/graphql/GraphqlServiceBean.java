@@ -35,7 +35,7 @@ public class GraphqlServiceBean {
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
-                                .dataFetcher("users", graphqlDataFetcher.getUsers())
+                                .dataFetcher("cars", graphqlDataFetcher.getCars())
 //                        .dataFetcher("roles", graphQLDataFetcher.getRoles())
                 )
 //                .type("User", typeWiring -> typeWiring
