@@ -1,6 +1,6 @@
 package com.company.scr.portal.graphql;
 
-import com.haulmont.cuba.core.global.Resources;
+import com.company.scr.service.GraphqlSchemaService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.InputStream;
 
 
 
@@ -24,18 +22,16 @@ public class GraphqlServiceBean {
     private final Logger log = LoggerFactory.getLogger(GraphqlServiceBean.class);
 
     @Inject
-    Resources resources;
-    @Inject
     GraphqlDataFetcher graphqlDataFetcher;
+    @Inject
+    GraphqlSchemaService graphqlSchemaService;
 
     private GraphQL graphQL;
 
-    @PostConstruct
-    private void loadSchema() {
-
-        InputStream schemaIS = resources.getResourceAsStream("com/company/scr/schema.graphql");
-
-        TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaIS);
+    private void initGql() {
+        String schemaInput = graphqlSchemaService.loadSchema();
+        log.warn("loadSchema: schema {}", schemaInput);
+        TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
@@ -55,6 +51,10 @@ public class GraphqlServiceBean {
     }
 
     public ExecutionResult executeGraphQL(String query) {
+        if (graphQL == null) {
+            initGql();
+        };
+
         log.info("executeGraphQL: query {}", query);
         ExecutionResult result = graphQL.execute(query);
         log.info("executeGraphQL result {}", result);
