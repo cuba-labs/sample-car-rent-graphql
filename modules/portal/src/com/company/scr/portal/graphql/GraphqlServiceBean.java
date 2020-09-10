@@ -6,16 +6,12 @@ import com.company.scr.service.GraphqlSchemaService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-
 
 
 @Component
@@ -36,6 +32,7 @@ public class GraphqlServiceBean {
         String schemaInput = graphqlSchemaService.loadSchema();
         log.warn("loadSchema: {}", schemaInput);
         TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
+        typeDefinitionRegistry.add(SchemaBuilder.buildQuery(Car.class, Garage.class));
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
@@ -44,14 +41,12 @@ public class GraphqlServiceBean {
                         .dataFetcher("garages", collectionDataFetcher.loadEntities(Garage.class))
                         .dataFetcher("garageById", entityDataFetcher.loadEntity(Garage.class))
                 )
-//                .type("User", typeWiring -> typeWiring
-//                        .dataFetcher("roles", graphQLDataFetcher.getUserRoles()))
-//                .type("Role", typeWiring -> typeWiring
-//                        .dataFetcher("users", graphQLDataFetcher.getRoleUsers()))
                 .build();
 
         GraphQLSchema graphQLSchema =
                 new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
+
+        log.warn("graphQLSchema {}", new SchemaPrinter().print(graphQLSchema));
 
         graphQL = GraphQL.newGraphQL(graphQLSchema).build();
     }
@@ -65,7 +60,6 @@ public class GraphqlServiceBean {
         ExecutionResult result = graphQL.execute(query);
         log.info("executeGraphQL result {}", result);
         return result;
-
     }
 
 }

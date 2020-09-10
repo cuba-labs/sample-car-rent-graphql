@@ -1,18 +1,3 @@
-schema {
-  query: Query
-}
-
-# Main query type for fetching data from tables
-type Query {
-  # Cars
-  cars: [Car]
-  carById(id: String): Car
-
-  # Garages
-  garages: [Garage]
-  garageById(id: String): Garage
-}
-
 type Car {
   id: ID!,
   regNumber: String
