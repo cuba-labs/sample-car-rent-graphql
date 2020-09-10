@@ -4,8 +4,8 @@ schema {
 
 # Main query type for fetching data from tables
 type Query {
-  cars: [Car]
-  garages: [Garage]
+  cars(regNumber: String): [Car]
+  garages(name: String): [Garage]
 }
 
 type Car {
