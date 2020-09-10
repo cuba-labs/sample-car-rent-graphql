@@ -1,5 +1,7 @@
 package com.company.scr.portal.graphql;
 
+import com.company.scr.entity.Car;
+import com.company.scr.entity.Garage;
 import com.company.scr.service.GraphqlSchemaService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -35,8 +37,8 @@ public class GraphqlServiceBean {
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
-                                .dataFetcher("cars", graphqlDataFetcher.getCars())
-//                        .dataFetcher("roles", graphQLDataFetcher.getRoles())
+                        .dataFetcher("cars", graphqlDataFetcher.loadEntities(Car.class, "car-gql"))
+                        .dataFetcher("garages", graphqlDataFetcher.loadEntities(Garage.class, "garage-gql"))
                 )
 //                .type("User", typeWiring -> typeWiring
 //                        .dataFetcher("roles", graphQLDataFetcher.getUserRoles()))

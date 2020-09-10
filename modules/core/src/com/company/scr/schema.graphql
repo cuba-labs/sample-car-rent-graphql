@@ -5,6 +5,7 @@ schema {
 # Main query type for fetching data from tables
 type Query {
   cars: [Car]
+  garages: [Garage]
 }
 
 type Car {

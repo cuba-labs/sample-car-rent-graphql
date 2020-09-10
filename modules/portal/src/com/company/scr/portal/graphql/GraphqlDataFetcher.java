@@ -1,6 +1,6 @@
 package com.company.scr.portal.graphql;
 
-import com.company.scr.entity.Car;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.LoadContext;
 import graphql.schema.DataFetcher;
@@ -19,14 +19,13 @@ public class GraphqlDataFetcher {
     @Inject
     protected DataManager dataManager;
 
-    public DataFetcher<List<Car>> getCars() {
+    public <E extends Entity> DataFetcher<List<E>> loadEntities(Class<E> entityClass, String view) {
         return environment -> {
-            LoadContext<Car> lc = new LoadContext<>(Car.class);
-            lc.setView("car-gql");
+            LoadContext<E> lc = new LoadContext<E>(entityClass);
+            lc.setView(view);
 
             log.warn("loadList {}", lc);
-            List<Car> cars = dataManager.loadList(lc);
-            return cars;
+            return dataManager.loadList(lc);
         };
     }
 
