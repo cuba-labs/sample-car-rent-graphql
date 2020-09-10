@@ -24,7 +24,7 @@ public class GraphqlServiceBean {
     private final Logger log = LoggerFactory.getLogger(GraphqlServiceBean.class);
 
     @Inject
-    GraphqlDataFetcher graphqlDataFetcher;
+    CollectionDataFetcher collectionDataFetcher;
     @Inject
     GraphqlSchemaService graphqlSchemaService;
 
@@ -37,8 +37,8 @@ public class GraphqlServiceBean {
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
-                        .dataFetcher("cars", graphqlDataFetcher.loadEntities(Car.class, "car-gql"))
-                        .dataFetcher("garages", graphqlDataFetcher.loadEntities(Garage.class, "garage-gql"))
+                        .dataFetcher("cars", collectionDataFetcher.loadEntities(Car.class))
+                        .dataFetcher("garages", collectionDataFetcher.loadEntities(Garage.class))
                 )
 //                .type("User", typeWiring -> typeWiring
 //                        .dataFetcher("roles", graphQLDataFetcher.getUserRoles()))

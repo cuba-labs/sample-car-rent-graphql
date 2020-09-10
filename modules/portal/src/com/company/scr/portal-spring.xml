@@ -27,5 +27,5 @@
     </bean>
 
     <bean class="com.company.scr.portal.graphql.GraphqlServiceBean" name="graphqlServiceBean"/>
-    <bean class="com.company.scr.portal.graphql.GraphqlDataFetcher" name="graphqlDataFetcher"/>
+    <bean class="com.company.scr.portal.graphql.CollectionDataFetcher" name="graphqlDataFetcher"/>
 </beans>
