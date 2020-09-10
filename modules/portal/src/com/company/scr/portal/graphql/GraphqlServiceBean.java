@@ -26,6 +26,8 @@ public class GraphqlServiceBean {
     @Inject
     CollectionDataFetcher collectionDataFetcher;
     @Inject
+    EntityDataFetcher entityDataFetcher;
+    @Inject
     GraphqlSchemaService graphqlSchemaService;
 
     private GraphQL graphQL;
@@ -38,7 +40,9 @@ public class GraphqlServiceBean {
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
                         .dataFetcher("cars", collectionDataFetcher.loadEntities(Car.class))
+                        .dataFetcher("carById", entityDataFetcher.loadEntity(Car.class))
                         .dataFetcher("garages", collectionDataFetcher.loadEntities(Garage.class))
+                        .dataFetcher("garageById", entityDataFetcher.loadEntity(Garage.class))
                 )
 //                .type("User", typeWiring -> typeWiring
 //                        .dataFetcher("roles", graphQLDataFetcher.getUserRoles()))
@@ -55,7 +59,7 @@ public class GraphqlServiceBean {
     public ExecutionResult executeGraphQL(String query) {
         if (graphQL == null) {
             initGql();
-        };
+        }
 
         log.info("executeGraphQL: query {}", query);
         ExecutionResult result = graphQL.execute(query);
