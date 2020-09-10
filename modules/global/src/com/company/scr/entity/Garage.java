@@ -46,6 +46,17 @@ public class Garage extends StandardEntity {
     @MetaProperty
     protected List<Car> currentCars;
 
+    @OneToMany(mappedBy = "garage")
+    private List<Car> cars;
+
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
+    }
+
     public List<Car> getCurrentCars() {
         return currentCars;
     }

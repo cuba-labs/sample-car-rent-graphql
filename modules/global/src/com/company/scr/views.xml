@@ -137,4 +137,25 @@
         <property name="stringIdTestEntityAttr" view="_minimal"/>
         <property name="weirdStringIdTestEntityAttr" view="_minimal"/>
     </view>
+
+<!--   GraphQL  -->
+
+    <view class="com.company.scr.entity.Car"
+          extends="_local"
+          name="car-gql">
+        <property name="garage"
+                  view="garage-gql"/>
+        <property name="technicalCertificate"
+                  view="_minimal"/>
+        <property name="photo"
+                  view="_minimal"/>
+    </view>
+
+    <view class="com.company.scr.entity.Garage"
+          extends="_local"
+          name="garage-gql">
+        <property name="cars"
+                  view="_minimal"/>
+    </view>
+
 </views>

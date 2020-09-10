@@ -30,7 +30,7 @@ public class GraphqlServiceBean {
 
     private void initGql() {
         String schemaInput = graphqlSchemaService.loadSchema();
-        log.warn("loadSchema: schema {}", schemaInput);
+        log.warn("loadSchema: {}", schemaInput);
         TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
 
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
