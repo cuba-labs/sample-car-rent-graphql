@@ -32,16 +32,11 @@ public class GraphqlServiceBean {
         String schemaInput = graphqlSchemaService.loadSchema();
         log.warn("loadSchema: {}", schemaInput);
         TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
-        typeDefinitionRegistry.add(SchemaBuilder.buildQuery(Car.class, Garage.class));
 
-        RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
-                .type("Query", typeWiring -> typeWiring
-                        .dataFetcher("cars", collectionDataFetcher.loadEntities(Car.class))
-                        .dataFetcher("carById", entityDataFetcher.loadEntity(Car.class))
-                        .dataFetcher("garages", collectionDataFetcher.loadEntities(Garage.class))
-                        .dataFetcher("garageById", entityDataFetcher.loadEntity(Garage.class))
-                )
-                .build();
+        // Provide API (gql queries) for entities listed below
+        Class[] classes = {Car.class, Garage.class};
+        typeDefinitionRegistry.add(SchemaBuilder.buildQuery(classes));
+        RuntimeWiring runtimeWiring = SchemaBuilder.assignDataFetchers(collectionDataFetcher, entityDataFetcher, classes);
 
         GraphQLSchema graphQLSchema =
                 new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);

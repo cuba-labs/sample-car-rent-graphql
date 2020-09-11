@@ -2,6 +2,7 @@ package com.company.scr.portal.graphql;
 
 import com.haulmont.cuba.core.entity.Entity;
 import graphql.language.*;
+import graphql.schema.idl.RuntimeWiring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,4 +38,21 @@ public class SchemaBuilder {
 
         return queryTypeBuilder.build();
     }
+
+    public static RuntimeWiring assignDataFetchers(CollectionDataFetcher collectionDataFetcher,
+                                                   EntityDataFetcher entityDataFetcher,
+                                                   Class<? extends Entity>... entityClasses) {
+
+        RuntimeWiring.Builder runtimeWiringBuilder = RuntimeWiring.newRuntimeWiring();
+        Arrays.stream(entityClasses).forEach(aClass -> {
+            String classLowerCase = aClass.getSimpleName().toLowerCase();
+            runtimeWiringBuilder.type("Query", typeWiring -> typeWiring
+                    .dataFetcher(classLowerCase + "s", collectionDataFetcher.loadEntities(aClass))
+                    .dataFetcher(classLowerCase + "ById", entityDataFetcher.loadEntity(aClass))
+            );
+        });
+
+        return runtimeWiringBuilder.build();
+    }
+
 }
