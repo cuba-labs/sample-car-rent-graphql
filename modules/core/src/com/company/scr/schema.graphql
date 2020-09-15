@@ -1,11 +1,11 @@
-type Car {
+type scr_Car {
   id: ID!,
   regNumber: String
-  garage: Garage
+  garage: scr_Garage
 }
 
-type Garage {
+type scr_Garage {
   id: ID!,
   name: String,
-  cars: [Car]
+  cars: [scr_Car]
 }

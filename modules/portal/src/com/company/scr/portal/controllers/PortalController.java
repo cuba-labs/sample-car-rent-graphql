@@ -12,10 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -60,6 +57,12 @@ public class PortalController {
         ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(result);
         log.info("graphql return {}", body);
         return body;
+    }
+
+    @GetMapping(value = "/graphql/schema")
+    public ResponseEntity<String> schema() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(graphqlServiceBean.getSchema());
     }
 
 }

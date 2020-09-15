@@ -28,6 +28,8 @@ public class GraphqlServiceBean {
 
     private GraphQL graphQL;
 
+    private GraphQLSchema graphQLSchema;
+
     private void initGql() {
         String schemaInput = graphqlSchemaService.loadSchema();
         log.warn("loadSchema: {}", schemaInput);
@@ -38,9 +40,7 @@ public class GraphqlServiceBean {
         typeDefinitionRegistry.add(SchemaBuilder.buildQuery(classes));
         RuntimeWiring runtimeWiring = SchemaBuilder.assignDataFetchers(collectionDataFetcher, entityDataFetcher, classes);
 
-        GraphQLSchema graphQLSchema =
-                new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-
+        graphQLSchema = new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
         log.warn("graphQLSchema {}", new SchemaPrinter().print(graphQLSchema));
 
         graphQL = GraphQL.newGraphQL(graphQLSchema).build();
@@ -55,6 +55,13 @@ public class GraphqlServiceBean {
         ExecutionResult result = graphQL.execute(query);
         log.info("executeGraphQL result {}", result);
         return result;
+    }
+
+    public String getSchema() {
+        if (graphQLSchema == null) {
+            initGql();
+        }
+        return new SchemaPrinter().print(graphQLSchema);
     }
 
 }

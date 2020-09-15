@@ -16,15 +16,15 @@ public class SchemaBuilder {
 
         Arrays.stream(entityClasses).forEach(aClass -> {
 
-            String className = aClass.getSimpleName();
-            String classLowerCase = className.toLowerCase();
+            String className = className(aClass);
+//            String classLowerCase = className.toLowerCase();
             TypeName entityType = new TypeName(className);
 
             // cars: [Car]
-            fieldDefinitions.add(new FieldDefinition(classLowerCase + "s", new ListType(entityType)));
+            fieldDefinitions.add(new FieldDefinition(className + "s", new ListType(entityType)));
 
             FieldDefinition byIdQuery = FieldDefinition.newFieldDefinition()
-                    .name(classLowerCase + "ById").type(entityType)
+                    .name(className + "ById").type(entityType)
                     .inputValueDefinition(new InputValueDefinition("id", new TypeName("String")))
                     .build();
             // carById(id: String): Car
@@ -45,14 +45,20 @@ public class SchemaBuilder {
 
         RuntimeWiring.Builder runtimeWiringBuilder = RuntimeWiring.newRuntimeWiring();
         Arrays.stream(entityClasses).forEach(aClass -> {
-            String classLowerCase = aClass.getSimpleName().toLowerCase();
+//            String classLowerCase = aClass.getSimpleName().toLowerCase();
+            String className = className(aClass);
+
             runtimeWiringBuilder.type("Query", typeWiring -> typeWiring
-                    .dataFetcher(classLowerCase + "s", collectionDataFetcher.loadEntities(aClass))
-                    .dataFetcher(classLowerCase + "ById", entityDataFetcher.loadEntity(aClass))
+                    .dataFetcher(className + "s", collectionDataFetcher.loadEntities(aClass))
+                    .dataFetcher(className + "ById", entityDataFetcher.loadEntity(aClass))
             );
         });
 
         return runtimeWiringBuilder.build();
+    }
+
+    private static String className(Class aClass) {
+        return "scr_" + aClass.getSimpleName();
     }
 
 }
