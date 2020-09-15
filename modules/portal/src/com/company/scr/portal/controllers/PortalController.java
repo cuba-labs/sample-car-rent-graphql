@@ -1,6 +1,6 @@
 package com.company.scr.portal.controllers;
 
-import com.company.scr.portal.graphql.GraphqlServiceBean;
+import com.company.scr.portal.graphql.GraphQLPortalService;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.portal.security.PortalSessionProvider;
@@ -26,7 +26,7 @@ public class PortalController {
     @Inject
     protected DataService dataService;
     @Inject
-    private GraphqlServiceBean graphqlServiceBean;
+    private GraphQLPortalService graphQLPortalService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
@@ -45,7 +45,7 @@ public class PortalController {
 
     @PostMapping("/graphiql-inner-query")
     public ResponseEntity<Object> graphiqlInnerQuery(@RequestBody Map<String, String> requestBody) {
-        ExecutionResult result = graphqlServiceBean.executeGraphQL(requestBody.get("query"));
+        ExecutionResult result = graphQLPortalService.executeGraphQL(requestBody.get("query"));
         ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(result);
         log.info("graphiqlInnerQuery return {}", body);
         return body;
@@ -53,7 +53,7 @@ public class PortalController {
 
     @PostMapping("/graphql")
     public ResponseEntity<Object> graphql(@RequestBody String query) {
-        ExecutionResult result = graphqlServiceBean.executeGraphQL(query);
+        ExecutionResult result = graphQLPortalService.executeGraphQL(query);
         ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(result);
         log.info("graphql return {}", body);
         return body;
@@ -62,7 +62,7 @@ public class PortalController {
     @GetMapping(value = "/graphql/schema")
     public ResponseEntity<String> schema() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(graphqlServiceBean.getSchema());
+                .body(graphQLPortalService.getSchema());
     }
 
 }

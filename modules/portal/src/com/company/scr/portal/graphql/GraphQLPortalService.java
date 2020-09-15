@@ -2,7 +2,7 @@ package com.company.scr.portal.graphql;
 
 import com.company.scr.entity.Car;
 import com.company.scr.entity.Garage;
-import com.company.scr.service.GraphqlEntityTypesService;
+import com.company.scr.service.GraphQLService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.Scalars;
@@ -14,34 +14,34 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.UUID;
+import java.util.Arrays;
 
 
 @Component
-public class GraphqlServiceBean {
+public class GraphQLPortalService {
 
-    private final Logger log = LoggerFactory.getLogger(GraphqlServiceBean.class);
+    private final Logger log = LoggerFactory.getLogger(GraphQLPortalService.class);
 
     @Inject
     CollectionDataFetcher collectionDataFetcher;
     @Inject
     EntityDataFetcher entityDataFetcher;
     @Inject
-    GraphqlEntityTypesService graphqlEntityTypesService;
+    GraphQLService graphQLService;
 
     private GraphQL graphQL;
 
     private GraphQLSchema graphQLSchema;
 
     private void initGql() {
-        String schemaInput = graphqlEntityTypesService.loadSchema();
+
+        Class[] classes = {Car.class, Garage.class};
+
+        String schemaInput = graphQLService.loadSchema(Arrays.asList(classes));
 //        log.warn("loadSchema: {}", schemaInput);
         TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
 
         // Provide API (gql queries) for entities listed below
-        Class[] classes = {Car.class, Garage.class};
-        // todo query already built
-        typeDefinitionRegistry.add(SchemaBuilder.buildQuery(classes));
 
         RuntimeWiring.Builder rwBuilder = RuntimeWiring.newRuntimeWiring();
         rwBuilder.scalar(JavaScalars.GraphQLUUID)
@@ -50,7 +50,7 @@ public class GraphqlServiceBean {
                 .scalar(JavaScalars.GraphQLLocalDateTime)
                 .scalar(Scalars.GraphQLLong)
                 .scalar(Scalars.GraphQLBigDecimal);
-        SchemaBuilder.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, classes);
+        GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, classes);
 
         graphQLSchema = new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, rwBuilder.build());
 //        log.warn("graphQLSchema {}", new SchemaPrinter().print(graphQLSchema));

@@ -21,12 +21,12 @@
             <map>
                 <entry key="scr_FavoriteService"
                        value="com.company.scr.service.FavoriteService"/>
-                <entry key="scr_GraphqlSchemaService" value="com.company.scr.service.GraphqlEntityTypesService"/>
+                <entry key="scr_GraphqlSchemaService" value="com.company.scr.service.GraphQLService"/>
             </map>
         </property>
     </bean>
 
-    <bean class="com.company.scr.portal.graphql.GraphqlServiceBean" name="graphqlServiceBean"/>
+    <bean class="com.company.scr.portal.graphql.GraphQLPortalService" name="graphqlServiceBean"/>
     <bean class="com.company.scr.portal.graphql.CollectionDataFetcher"/>
     <bean class="com.company.scr.portal.graphql.EntityDataFetcher"/>
 </beans>

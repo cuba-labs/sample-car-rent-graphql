@@ -1,5 +1,6 @@
 package com.company.scr.service;
 
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.ReferenceToEntity;
 import graphql.Scalars;
 import graphql.schema.*;
@@ -34,12 +35,15 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
      *
      * @param entityManager The manager containing the data models to include in the final GraphQL schema.
      */
-    public GraphQLSchemaBuilder(EntityManager entityManager) {
+    public GraphQLSchemaBuilder(EntityManager entityManager, List<Class<? extends Entity>> classes) {
         this.entityManager = entityManager;
-
         populateStandardAttributeMappers();
 
-        super.query(getQueryType());
+        super.query(getQueryType(classes));
+
+        // add types to schema
+        entityCache.forEach((entityType, graphQLObjectType) -> super.additionalType(graphQLObjectType));
+        super.additionalTypes(new HashSet<>(entityCache.values()));
     }
 
     private void populateStandardAttributeMappers() {
@@ -59,12 +63,38 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
     }
 
 
-    GraphQLObjectType getQueryType() {
-        GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("QueryType_JPA").description("All encompassing schema for this JPA environment");
-        queryType.fields(entityManager.getMetamodel().getEntities().stream().filter(this::isNotIgnored).map(this::getQueryFieldDefinition).collect(Collectors.toList()));
-//        queryType.fields(entityManager.getMetamodel().getEntities().stream().filter(this::isNotIgnored).map(this::getQueryFieldPageableDefinition).collect(Collectors.toList()));
-//        queryType.fields(entityManager.getMetamodel().getEmbeddables().stream().filter(this::isNotIgnored).map(this::getQueryEmbeddedFieldDefinition).collect(Collectors.toList()));
+    GraphQLObjectType getQueryType(List<Class<? extends Entity>> classes) {
+        GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("Query").description("All encompassing schema for this JPA environment");
 
+        // todo rework
+        List<GraphQLFieldDefinition> fieldsList = entityManager.getMetamodel().getEntities().stream()
+                .filter(this::isNotIgnored)
+                .map(this::getQueryFieldDefinition)
+                .collect(Collectors.toList());
+
+        List<GraphQLFieldDefinition> fields = new ArrayList<>();
+        classes.forEach(aClass -> {
+            EntityType entityType = entityManager.getMetamodel().getEntities().stream().filter(et -> et.getJavaType().equals(aClass)).findAny().get();
+            GraphQLType type = entityCache.get(entityType);
+
+            // query scr_Cars
+            fields.add(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                            .name("scr_" + aClass.getSimpleName() + "s")
+                            .type(new GraphQLList(type))
+                            .build());
+
+            // query scr_CarById(id)
+            fields.add(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                            .name("scr_" + aClass.getSimpleName() + "ById")
+                            .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
+                            .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString).build())
+                            .build());
+
+        });
+
+        queryType.fields(fields);
         return queryType.build();
     }
 
