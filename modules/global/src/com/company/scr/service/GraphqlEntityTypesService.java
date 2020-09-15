@@ -1,6 +1,6 @@
 package com.company.scr.service;
 
-public interface GraphqlSchemaService {
+public interface GraphqlEntityTypesService {
     String NAME = "scr_GraphqlSchemaService";
 
     String loadSchema();

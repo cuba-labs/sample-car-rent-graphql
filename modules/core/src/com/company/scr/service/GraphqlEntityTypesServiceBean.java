@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
-@Service(GraphqlSchemaService.NAME)
-public class GraphqlSchemaServiceBean implements GraphqlSchemaService {
+@Service(GraphqlEntityTypesService.NAME)
+public class GraphqlEntityTypesServiceBean implements GraphqlEntityTypesService {
 
-    private final Logger log = LoggerFactory.getLogger(GraphqlSchemaServiceBean.class);
+    private final Logger log = LoggerFactory.getLogger(GraphqlEntityTypesServiceBean.class);
 
     @Inject
     Resources resources;
@@ -30,8 +30,8 @@ public class GraphqlSchemaServiceBean implements GraphqlSchemaService {
 
     @Override
     public String loadSchema() {
-//        return entitySchema();
-        return resources.getResourceAsString("com/company/scr/schema.graphql");
+        return entitySchema();
+//        return resources.getResourceAsString("com/company/scr/schema.graphql");
     }
 
 

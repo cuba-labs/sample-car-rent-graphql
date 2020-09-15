@@ -39,22 +39,20 @@ public class SchemaBuilder {
         return queryTypeBuilder.build();
     }
 
-    public static RuntimeWiring assignDataFetchers(CollectionDataFetcher collectionDataFetcher,
+    public static void assignDataFetchers(RuntimeWiring.Builder rwBuilder,
+                                                   CollectionDataFetcher collectionDataFetcher,
                                                    EntityDataFetcher entityDataFetcher,
                                                    Class<? extends Entity>... entityClasses) {
 
-        RuntimeWiring.Builder runtimeWiringBuilder = RuntimeWiring.newRuntimeWiring();
         Arrays.stream(entityClasses).forEach(aClass -> {
 //            String classLowerCase = aClass.getSimpleName().toLowerCase();
             String className = className(aClass);
 
-            runtimeWiringBuilder.type("Query", typeWiring -> typeWiring
+            rwBuilder.type("Query", typeWiring -> typeWiring
                     .dataFetcher(className + "s", collectionDataFetcher.loadEntities(aClass))
                     .dataFetcher(className + "ById", entityDataFetcher.loadEntity(aClass))
             );
         });
-
-        return runtimeWiringBuilder.build();
     }
 
     private static String className(Class aClass) {
