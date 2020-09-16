@@ -1,6 +1,8 @@
 package com.company.scr.service;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.entity.Folder;
 import com.haulmont.cuba.core.entity.ReferenceToEntity;
 import graphql.Scalars;
 import graphql.schema.*;
@@ -114,32 +116,11 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
         return getAttributeType(attribute)
                 .filter(type -> type instanceof GraphQLOutputType)
                 .map(type -> {
-                    List<GraphQLArgument> arguments = new ArrayList<>();
-                    arguments.add(GraphQLArgument.newArgument().name("orderBy").type(orderByDirectionEnum).build());            // Always add the orderBy argument
-
-                    // Get the fields that can be queried on (i.e. Simple Types, no Sub-Objects)
-                    if (attribute instanceof SingularAttribute
-                            && attribute.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
-                        ManagedType foreignType = (ManagedType) ((SingularAttribute) attribute).getType();
-
-                        Stream<Attribute> attributes = findBasicAttributes(foreignType.getAttributes());
-
-                        attributes.forEach(it -> {
-                            arguments.add(GraphQLArgument.newArgument()
-                                    .name(it.getName())
-                                    .type((GraphQLInputType) getAttributeType(it).findFirst().get())
-                                    .build());
-                        });
-                    }
-
                     String name = attribute.getName();
-
-
                     return GraphQLFieldDefinition.newFieldDefinition()
                             .name(name)
                             .description(getSchemaDocumentation(attribute.getJavaMember()))
                             .type((GraphQLOutputType) type)
-                            .argument(arguments)
                             .build();
                 });
     }
@@ -255,29 +236,33 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
     private boolean isNotIgnored(Attribute attribute) {
         Class javaType = attribute.getJavaType();
         String attrName = attribute.getName();
-        // embedded not support now
-        if (ReferenceToEntity.class.isAssignableFrom(javaType)) {
+        // embedded and other which not support now
+        if (ReferenceToEntity.class.isAssignableFrom(javaType)
+                || Folder.class.isAssignableFrom(javaType)
+                || FileDescriptor.class.isAssignableFrom(javaType)) {
             log.warn("isNotIgnored return false for attribute {}:{}", attrName, javaType);
             return false;
         }
+
+        //noinspection RedundantIfStatement
+        if (Arrays.asList("createTs", "updateTs", "deleteTs", "createdBy", "updatedBy", "deletedBy", "version")
+                .contains(attrName)) {
+            return false;
+        }
+
         return true;
     }
 
     private boolean isNotIgnored(EntityType entityType) {
+        if (convertType(entityType.getName()).startsWith("sys_")) {
+            return false;
+        };
         return true;
     }
 
     private String getSchemaDocumentation(Object o) {
         return null;
     }
-
-    private static final GraphQLEnumType orderByDirectionEnum =
-            GraphQLEnumType.newEnum()
-                    .name("OrderByDirection")
-                    .description("Describes the direction (Ascending / Descending) to sort a field.")
-                    .value("ASC", 0, "Ascending")
-                    .value("DESC", 1, "Descending")
-                    .build();
 
     private static String convertType(String name) {
         return name.replaceAll("\\$", "_");
