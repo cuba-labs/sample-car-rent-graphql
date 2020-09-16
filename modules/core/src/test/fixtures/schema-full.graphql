@@ -1,0 +1,1104 @@
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if`'argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if`'argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Marks the field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+) on FIELD_DEFINITION | ENUM_VALUE
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+) on SCALAR
+
+"All encompassing schema for this JPA environment"
+type Query {
+    scr_CarById(id: String): scr_Car
+    scr_Cars: [scr_Car]
+    scr_GarageById(id: String): scr_Garage
+    scr_Garages: [scr_Garage]
+}
+
+type datagen_GeneratedEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    entityName(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    instName(orderBy: OrderByDirection): String
+    instanceId(orderBy: OrderByDirection): String
+}
+
+type scr_AssociationM2MTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntities(orderBy: OrderByDirection): [scr_DatatypesTestEntity]
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_AssociationM2OTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_AssociationO2MTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_AssociationO2OTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    deeplyNestedTestEntity(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DeeplyNestedTestEntity
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_BoringStringIdTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    uuid(orderBy: OrderByDirection): UUID
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_Car {
+    carType(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    ecoRank(orderBy: OrderByDirection): Int
+    garage(address: String, capacity: Int, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, vanEntry: Boolean, version: Int, workingHoursFrom: String, workingHoursTo: String): scr_Garage
+    id(orderBy: OrderByDirection): UUID
+    manufactureDate(orderBy: OrderByDirection): Date
+    manufacturer(orderBy: OrderByDirection): String
+    maxPassengers(orderBy: OrderByDirection): Int
+    mileage(orderBy: OrderByDirection): Float
+    model(orderBy: OrderByDirection): String
+    photo(createDate: Date, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, extension: String, id: UUID, name: String, orderBy: OrderByDirection, size: Long, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sys_FileDescriptor
+    price(orderBy: OrderByDirection): BigDecimal
+    purchaseDate(orderBy: OrderByDirection): Date
+    regNumber(orderBy: OrderByDirection): String
+    technicalCertificate(certNumber: String, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_TechnicalCertificate
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    wheelOnRight(orderBy: OrderByDirection): Boolean
+}
+
+type scr_CarRent {
+    car(carType: String, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, ecoRank: Int, id: UUID, manufactureDate: Date, manufacturer: String, maxPassengers: Int, mileage: Float, model: String, orderBy: OrderByDirection, price: BigDecimal, purchaseDate: Date, regNumber: String, updateTs: Date, updatedBy: String, version: Int, wheelOnRight: Boolean): scr_Car
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    fromDate(orderBy: OrderByDirection): Date
+    fromDateTime(orderBy: OrderByDirection): Date
+    fromTime(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_CompositionO2MTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    quantity(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_CompositionO2OTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    nestedComposition(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DeeplyNestedTestEntity
+    quantity(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_DatatypesTestEntity {
+    associationM2Mattr(orderBy: OrderByDirection): [scr_AssociationM2MTestEntity]
+    associationM2Oattr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_AssociationM2OTestEntity
+    associationO2Mattr(orderBy: OrderByDirection): [scr_AssociationO2MTestEntity]
+    associationO2Oattr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_AssociationO2OTestEntity
+    bigDecimalAttr(orderBy: OrderByDirection): BigDecimal
+    booleanAttr(orderBy: OrderByDirection): Boolean
+    byteArrayAttr(orderBy: OrderByDirection): String
+    compositionO2Mattr(orderBy: OrderByDirection): [scr_CompositionO2MTestEntity]
+    compositionO2Oattr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, quantity: Int, updateTs: Date, updatedBy: String, version: Int): scr_CompositionO2OTestEntity
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity3(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DatatypesTestEntity3
+    dateAttr(orderBy: OrderByDirection): Date
+    dateTimeAttr(orderBy: OrderByDirection): Date
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    doubleAttr(orderBy: OrderByDirection): Float
+    enumAttr(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    intIdentityIdTestEntityAssociationO2OAttr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, id: Int, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_IntIdentityIdTestEntity
+    integerAttr(orderBy: OrderByDirection): Int
+    integerIdTestEntityAssociationM2MAttr(orderBy: OrderByDirection): [scr_IntegerIdTestEntity]
+    localDateAttr(orderBy: OrderByDirection): LocalDate
+    localDateTimeAttr(orderBy: OrderByDirection): LocalDateTime
+    localTimeAttr(orderBy: OrderByDirection): String
+    longAttr(orderBy: OrderByDirection): Long
+    name(orderBy: OrderByDirection): String
+    offsetDateTimeAttr(orderBy: OrderByDirection): String
+    offsetTimeAttr(orderBy: OrderByDirection): String
+    readOnlyStringAttr(orderBy: OrderByDirection): String
+    stringAttr(orderBy: OrderByDirection): String
+    stringIdTestEntityAssociationM2O(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, identifier: String, orderBy: OrderByDirection, productCode: String, updateTs: Date, updatedBy: String, version: Int): scr_StringIdTestEntity
+    stringIdTestEntityAssociationO2O(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, identifier: String, orderBy: OrderByDirection, productCode: String, updateTs: Date, updatedBy: String, version: Int): scr_StringIdTestEntity
+    timeAttr(orderBy: OrderByDirection): Date
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    uuidAttr(orderBy: OrderByDirection): UUID
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_DatatypesTestEntity2 {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntityAttr(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    intIdentityIdTestEntityAttr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, id: Int, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_IntIdentityIdTestEntity
+    integerIdTestEntityAttr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, id: Int, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_IntegerIdTestEntity
+    stringIdTestEntityAttr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, identifier: String, orderBy: OrderByDirection, productCode: String, updateTs: Date, updatedBy: String, version: Int): scr_StringIdTestEntity
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    weirdStringIdTestEntityAttr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, description: String, id: String, identifier: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_WeirdStringIdTestEntity
+}
+
+type scr_DatatypesTestEntity3 {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntityAttr(orderBy: OrderByDirection): [scr_DatatypesTestEntity]
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    intIdentityIdTestEntityAttr(orderBy: OrderByDirection): [scr_IntIdentityIdTestEntity]
+    integerIdTestEntityAttr(orderBy: OrderByDirection): [scr_IntegerIdTestEntity]
+    name(orderBy: OrderByDirection): String
+    stringIdTestEntityAttr(orderBy: OrderByDirection): [scr_StringIdTestEntity]
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    weirdStringIdTestEntityAttr(orderBy: OrderByDirection): [scr_WeirdStringIdTestEntity]
+}
+
+type scr_DeeplyNestedTestEntity {
+    associationO2Oattr(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_AssociationO2OTestEntity
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_FavoriteCar {
+    car(carType: String, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, ecoRank: Int, id: UUID, manufactureDate: Date, manufacturer: String, maxPassengers: Int, mileage: Float, model: String, orderBy: OrderByDirection, price: BigDecimal, purchaseDate: Date, regNumber: String, updateTs: Date, updatedBy: String, version: Int, wheelOnRight: Boolean): scr_Car
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    notes(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_Garage {
+    address(orderBy: OrderByDirection): String
+    capacity(orderBy: OrderByDirection): Int
+    cars(orderBy: OrderByDirection): [scr_Car]
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    personnel(orderBy: OrderByDirection): [scr_User]
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    vanEntry(orderBy: OrderByDirection): Boolean
+    version(orderBy: OrderByDirection): Int
+    workingHoursFrom(orderBy: OrderByDirection): String
+    workingHoursTo(orderBy: OrderByDirection): String
+}
+
+type scr_IntIdentityIdTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    datatypesTestEntity3(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DatatypesTestEntity3
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_IntegerIdTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntities(orderBy: OrderByDirection): [scr_DatatypesTestEntity]
+    datatypesTestEntity3(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DatatypesTestEntity3
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_SparePart {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    spareParts(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_SparePart
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_StringIdTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity(bigDecimalAttr: BigDecimal, booleanAttr: Boolean, byteArrayAttr: String, createTs: Date, createdBy: String, dateAttr: Date, dateTimeAttr: Date, deleteTs: Date, deletedBy: String, doubleAttr: Float, enumAttr: String, id: UUID, integerAttr: Int, localDateAttr: LocalDate, localDateTimeAttr: LocalDateTime, localTimeAttr: String, longAttr: Long, name: String, offsetDateTimeAttr: String, offsetTimeAttr: String, orderBy: OrderByDirection, readOnlyStringAttr: String, stringAttr: String, timeAttr: Date, updateTs: Date, updatedBy: String, uuidAttr: UUID, version: Int): scr_DatatypesTestEntity
+    datatypesTestEntity3(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DatatypesTestEntity3
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    identifier(orderBy: OrderByDirection): String
+    productCode(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_TechnicalCertificate {
+    car(carType: String, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, ecoRank: Int, id: UUID, manufactureDate: Date, manufacturer: String, maxPassengers: Int, mileage: Float, model: String, orderBy: OrderByDirection, price: BigDecimal, purchaseDate: Date, regNumber: String, updateTs: Date, updatedBy: String, version: Int, wheelOnRight: Boolean): scr_Car
+    certNumber(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_User {
+    active(orderBy: OrderByDirection): Boolean
+    changePasswordAtNextLogon(orderBy: OrderByDirection): Boolean
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    email(orderBy: OrderByDirection): String
+    firstName(orderBy: OrderByDirection): String
+    group(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    groupNames(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    ipMask(orderBy: OrderByDirection): String
+    language(orderBy: OrderByDirection): String
+    lastName(orderBy: OrderByDirection): String
+    login(orderBy: OrderByDirection): String
+    loginLowerCase(orderBy: OrderByDirection): String
+    middleName(orderBy: OrderByDirection): String
+    name(orderBy: OrderByDirection): String
+    password(orderBy: OrderByDirection): String
+    passwordEncryption(orderBy: OrderByDirection): String
+    phone(orderBy: OrderByDirection): String
+    position(orderBy: OrderByDirection): String
+    substitutions(orderBy: OrderByDirection): [sec_UserSubstitution]
+    sysTenantId(orderBy: OrderByDirection): String
+    timeZone(orderBy: OrderByDirection): String
+    timeZoneAuto(orderBy: OrderByDirection): Boolean
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    userRoles(orderBy: OrderByDirection): [sec_UserRole]
+    version(orderBy: OrderByDirection): Int
+}
+
+type scr_WeirdStringIdTestEntity {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatypesTestEntity3(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, updateTs: Date, updatedBy: String, version: Int): scr_DatatypesTestEntity3
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): String
+    identifier(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_Constraint {
+    checkType(orderBy: OrderByDirection): String
+    code(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    entityName(orderBy: OrderByDirection): String
+    filterXml(orderBy: OrderByDirection): String
+    groovyScript(orderBy: OrderByDirection): String
+    group(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    id(orderBy: OrderByDirection): UUID
+    isActive(orderBy: OrderByDirection): Boolean
+    joinClause(orderBy: OrderByDirection): String
+    operationType(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    whereClause(orderBy: OrderByDirection): String
+}
+
+type sec_EntityLog {
+    changes(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    entity(orderBy: OrderByDirection): String
+    entityInstanceName(orderBy: OrderByDirection): String
+    eventTs(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    sysTenantId(orderBy: OrderByDirection): String
+    type(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+}
+
+type sec_Filter {
+    code(orderBy: OrderByDirection): String
+    componentId(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    globalDefault(orderBy: OrderByDirection): Boolean
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    version(orderBy: OrderByDirection): Int
+    xml(orderBy: OrderByDirection): String
+}
+
+type sec_Group {
+    constraints(orderBy: OrderByDirection): [sec_Constraint]
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    hierarchyList(orderBy: OrderByDirection): [sec_GroupHierarchy]
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    parent(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    sessionAttributes(orderBy: OrderByDirection): [sec_SessionAttribute]
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_GroupHierarchy {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    group(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    id(orderBy: OrderByDirection): UUID
+    level(orderBy: OrderByDirection): Int
+    parent(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    sysTenantId(orderBy: OrderByDirection): String
+}
+
+type sec_LocalizedConstraintMessage {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    entityName(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    operationType(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    values(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_LoggedAttribute {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    entity(auto: Boolean, createTs: Date, createdBy: String, id: UUID, manual: Boolean, name: String, orderBy: OrderByDirection): sec_LoggedEntity
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+}
+
+type sec_LoggedEntity {
+    attributes(orderBy: OrderByDirection): [sec_LoggedAttribute]
+    auto(orderBy: OrderByDirection): Boolean
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    manual(orderBy: OrderByDirection): Boolean
+    name(orderBy: OrderByDirection): String
+}
+
+type sec_Permission {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    role(createTs: Date, createdBy: String, defaultRole: Boolean, deleteTs: Date, deletedBy: String, description: String, id: UUID, locName: String, name: String, orderBy: OrderByDirection, securityScope: String, sysTenantId: String, type: Int, updateTs: Date, updatedBy: String, version: Int): sec_Role
+    target(orderBy: OrderByDirection): String
+    type(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    value(orderBy: OrderByDirection): Int
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_Presentation {
+    autoSave(orderBy: OrderByDirection): Boolean
+    componentId(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    xml(orderBy: OrderByDirection): String
+}
+
+type sec_RememberMeToken {
+    createTs(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    token(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+}
+
+type sec_Role {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    defaultRole(orderBy: OrderByDirection): Boolean
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    locName(orderBy: OrderByDirection): String
+    name(orderBy: OrderByDirection): String
+    permissions(orderBy: OrderByDirection): [sec_Permission]
+    securityScope(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    type(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_ScreenHistory {
+    caption(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    substitutedUser(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    sysTenantId(orderBy: OrderByDirection): String
+    url(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+}
+
+type sec_SearchFolder {
+    applyDefault(orderBy: OrderByDirection): Boolean
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    entityType(orderBy: OrderByDirection): String
+    filterComponentId(orderBy: OrderByDirection): String
+    filterXml(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    isSet(orderBy: OrderByDirection): Boolean
+    name(orderBy: OrderByDirection): String
+    parent(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sortOrder: Int, sysTenantId: String, tabName: String, updateTs: Date, updatedBy: String, version: Int): sys_Folder
+    presentation(autoSave: Boolean, componentId: String, createTs: Date, createdBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, xml: String): sec_Presentation
+    sortOrder(orderBy: OrderByDirection): Int
+    sysTenantId(orderBy: OrderByDirection): String
+    tabName(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_SessionAttribute {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    datatype(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    group(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    stringValue(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_SessionLogEntry {
+    address(orderBy: OrderByDirection): String
+    clientInfo(orderBy: OrderByDirection): String
+    clientType(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    finishedTs(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    lastAction(orderBy: OrderByDirection): Int
+    server(orderBy: OrderByDirection): String
+    sessionId(orderBy: OrderByDirection): UUID
+    startedTs(orderBy: OrderByDirection): Date
+    substitutedUser(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    userData(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_User {
+    active(orderBy: OrderByDirection): Boolean
+    changePasswordAtNextLogon(orderBy: OrderByDirection): Boolean
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    email(orderBy: OrderByDirection): String
+    firstName(orderBy: OrderByDirection): String
+    group(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sec_Group
+    groupNames(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    ipMask(orderBy: OrderByDirection): String
+    language(orderBy: OrderByDirection): String
+    lastName(orderBy: OrderByDirection): String
+    login(orderBy: OrderByDirection): String
+    loginLowerCase(orderBy: OrderByDirection): String
+    middleName(orderBy: OrderByDirection): String
+    name(orderBy: OrderByDirection): String
+    password(orderBy: OrderByDirection): String
+    passwordEncryption(orderBy: OrderByDirection): String
+    position(orderBy: OrderByDirection): String
+    substitutions(orderBy: OrderByDirection): [sec_UserSubstitution]
+    sysTenantId(orderBy: OrderByDirection): String
+    timeZone(orderBy: OrderByDirection): String
+    timeZoneAuto(orderBy: OrderByDirection): Boolean
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    userRoles(orderBy: OrderByDirection): [sec_UserRole]
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_UserRole {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    role(createTs: Date, createdBy: String, defaultRole: Boolean, deleteTs: Date, deletedBy: String, description: String, id: UUID, locName: String, name: String, orderBy: OrderByDirection, securityScope: String, sysTenantId: String, type: Int, updateTs: Date, updatedBy: String, version: Int): sec_Role
+    roleName(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    version(orderBy: OrderByDirection): Int
+}
+
+type sec_UserSetting {
+    clientType(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    value(orderBy: OrderByDirection): String
+}
+
+type sec_UserSubstitution {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    endDate(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    startDate(orderBy: OrderByDirection): Date
+    substitutedUser(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    user(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_AccessToken {
+    authenticationBytes(orderBy: OrderByDirection): String
+    authenticationKey(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    expiry(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    locale(orderBy: OrderByDirection): String
+    refreshTokenValue(orderBy: OrderByDirection): String
+    tokenBytes(orderBy: OrderByDirection): String
+    tokenValue(orderBy: OrderByDirection): String
+    userLogin(orderBy: OrderByDirection): String
+}
+
+type sys_AppFolder {
+    applyDefault(orderBy: OrderByDirection): Boolean
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    filterComponentId(orderBy: OrderByDirection): String
+    filterXml(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    parent(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sortOrder: Int, sysTenantId: String, tabName: String, updateTs: Date, updatedBy: String, version: Int): sys_Folder
+    quantityScript(orderBy: OrderByDirection): String
+    sortOrder(orderBy: OrderByDirection): Int
+    sysTenantId(orderBy: OrderByDirection): String
+    tabName(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    visibilityScript(orderBy: OrderByDirection): String
+}
+
+type sys_Category {
+    categoryAttrs(orderBy: OrderByDirection): [sys_CategoryAttribute]
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    entityType(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    isDefault(orderBy: OrderByDirection): Boolean
+    localeNames(orderBy: OrderByDirection): String
+    name(orderBy: OrderByDirection): String
+    special(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_CategoryAttribute {
+    attributeConfigurationJson(orderBy: OrderByDirection): String
+    category(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, entityType: String, id: UUID, isDefault: Boolean, localeNames: String, name: String, orderBy: OrderByDirection, special: String, updateTs: Date, updatedBy: String, version: Int): sys_Category
+    categoryEntityType(orderBy: OrderByDirection): String
+    code(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    dataType(orderBy: OrderByDirection): String
+    defaultBoolean(orderBy: OrderByDirection): Boolean
+    defaultDate(orderBy: OrderByDirection): Date
+    defaultDateIsCurrent(orderBy: OrderByDirection): Boolean
+    defaultDateWithoutTime(orderBy: OrderByDirection): LocalDate
+    defaultDecimal(orderBy: OrderByDirection): BigDecimal
+    defaultDouble(orderBy: OrderByDirection): Float
+    defaultInt(orderBy: OrderByDirection): Int
+    defaultString(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    entityClass(orderBy: OrderByDirection): String
+    enumeration(orderBy: OrderByDirection): String
+    enumerationLocales(orderBy: OrderByDirection): String
+    filterXml(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    isCollection(orderBy: OrderByDirection): Boolean
+    joinClause(orderBy: OrderByDirection): String
+    localeDescriptions(orderBy: OrderByDirection): String
+    localeNames(orderBy: OrderByDirection): String
+    lookup(orderBy: OrderByDirection): Boolean
+    name(orderBy: OrderByDirection): String
+    orderNo(orderBy: OrderByDirection): Int
+    required(orderBy: OrderByDirection): Boolean
+    rowsCount(orderBy: OrderByDirection): Int
+    screen(orderBy: OrderByDirection): String
+    targetScreens(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+    whereClause(orderBy: OrderByDirection): String
+    width(orderBy: OrderByDirection): String
+}
+
+type sys_CategoryAttributeValue {
+    booleanValue(orderBy: OrderByDirection): Boolean
+    categoryAttribute(attributeConfigurationJson: String, categoryEntityType: String, code: String, createTs: Date, createdBy: String, dataType: String, defaultBoolean: Boolean, defaultDate: Date, defaultDateIsCurrent: Boolean, defaultDateWithoutTime: LocalDate, defaultDecimal: BigDecimal, defaultDouble: Float, defaultInt: Int, defaultString: String, deleteTs: Date, deletedBy: String, description: String, entityClass: String, enumeration: String, enumerationLocales: String, filterXml: String, id: UUID, isCollection: Boolean, joinClause: String, localeDescriptions: String, localeNames: String, lookup: Boolean, name: String, orderBy: OrderByDirection, orderNo: Int, required: Boolean, rowsCount: Int, screen: String, targetScreens: String, updateTs: Date, updatedBy: String, version: Int, whereClause: String, width: String): sys_CategoryAttribute
+    childValues(orderBy: OrderByDirection): [sys_CategoryAttributeValue]
+    code(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    dateValue(orderBy: OrderByDirection): Date
+    dateWithoutTimeValue(orderBy: OrderByDirection): LocalDate
+    decimalValue(orderBy: OrderByDirection): BigDecimal
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    doubleValue(orderBy: OrderByDirection): Float
+    id(orderBy: OrderByDirection): UUID
+    intValue(orderBy: OrderByDirection): Int
+    parent(booleanValue: Boolean, code: String, createTs: Date, createdBy: String, dateValue: Date, dateWithoutTimeValue: LocalDate, decimalValue: BigDecimal, deleteTs: Date, deletedBy: String, doubleValue: Float, id: UUID, intValue: Int, orderBy: OrderByDirection, stringValue: String, updateTs: Date, updatedBy: String, version: Int): sys_CategoryAttributeValue
+    stringValue(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_Config {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    value(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_EntitySnapshot {
+    author(active: Boolean, changePasswordAtNextLogon: Boolean, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, email: String, firstName: String, groupNames: String, id: UUID, ipMask: String, language: String, lastName: String, login: String, loginLowerCase: String, middleName: String, name: String, orderBy: OrderByDirection, password: String, passwordEncryption: String, phone: String, position: String, sysTenantId: String, timeZone: String, timeZoneAuto: Boolean, updateTs: Date, updatedBy: String, version: Int): scr_User
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    entityMetaClass(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    snapshotDate(orderBy: OrderByDirection): Date
+    snapshotXml(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    viewXml(orderBy: OrderByDirection): String
+}
+
+type sys_EntityStatistics {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    fetchUI(orderBy: OrderByDirection): Int
+    id(orderBy: OrderByDirection): UUID
+    instanceCount(orderBy: OrderByDirection): Long
+    lazyCollectionThreshold(orderBy: OrderByDirection): Int
+    lookupScreenThreshold(orderBy: OrderByDirection): Int
+    maxFetchUI(orderBy: OrderByDirection): Int
+    name(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+}
+
+type sys_FileDescriptor {
+    createDate(orderBy: OrderByDirection): Date
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    extension(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    size(orderBy: OrderByDirection): Long
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_Folder {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    parent(createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, id: UUID, name: String, orderBy: OrderByDirection, sortOrder: Int, sysTenantId: String, tabName: String, updateTs: Date, updatedBy: String, version: Int): sys_Folder
+    sortOrder(orderBy: OrderByDirection): Int
+    sysTenantId(orderBy: OrderByDirection): String
+    tabName(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_FtsQueue {
+    changeType(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    entityId(orderBy: OrderByDirection): UUID
+    entityName(orderBy: OrderByDirection): String
+    fake(orderBy: OrderByDirection): Boolean
+    id(orderBy: OrderByDirection): UUID
+    indexingHost(orderBy: OrderByDirection): String
+    intEntityId(orderBy: OrderByDirection): Int
+    longEntityId(orderBy: OrderByDirection): Long
+    sourceHost(orderBy: OrderByDirection): String
+    stringEntityId(orderBy: OrderByDirection): String
+}
+
+type sys_JmxInstance {
+    address(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    login(orderBy: OrderByDirection): String
+    nodeName(orderBy: OrderByDirection): String
+    password(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_LockDescriptor {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    timeoutSec(orderBy: OrderByDirection): Int
+}
+
+type sys_QueryResult {
+    entityId(orderBy: OrderByDirection): UUID
+    id(orderBy: OrderByDirection): Long
+    intEntityId(orderBy: OrderByDirection): Int
+    longEntityId(orderBy: OrderByDirection): Long
+    queryKey(orderBy: OrderByDirection): Int
+    sessionId(orderBy: OrderByDirection): UUID
+    stringEntityId(orderBy: OrderByDirection): String
+}
+
+type sys_RefreshToken {
+    authenticationBytes(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    expiry(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    tokenBytes(orderBy: OrderByDirection): String
+    tokenValue(orderBy: OrderByDirection): String
+    userLogin(orderBy: OrderByDirection): String
+}
+
+type sys_ScheduledExecution {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    finishTime(orderBy: OrderByDirection): Date
+    id(orderBy: OrderByDirection): UUID
+    result(orderBy: OrderByDirection): String
+    server(orderBy: OrderByDirection): String
+    startTime(orderBy: OrderByDirection): Date
+    sysTenantId(orderBy: OrderByDirection): String
+    task(active: Boolean, beanName: String, className: String, createTs: Date, createdBy: String, cron: String, definedBy: String, deleteTs: Date, deletedBy: String, description: String, id: UUID, lastStartServer: String, lastStartTime: Date, logFinish: Boolean, logStart: Boolean, methodName: String, methodParamsXml: String, orderBy: OrderByDirection, period: Int, permittedServers: String, schedulingType: String, scriptName: String, singleton: Boolean, startDate: Date, startDelay: Int, sysTenantId: String, timeFrame: Int, timeout: Int, updateTs: Date, updatedBy: String, userName: String): sys_ScheduledTask
+}
+
+type sys_ScheduledTask {
+    active(orderBy: OrderByDirection): Boolean
+    beanName(orderBy: OrderByDirection): String
+    className(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    cron(orderBy: OrderByDirection): String
+    definedBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    description(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    lastStartServer(orderBy: OrderByDirection): String
+    lastStartTime(orderBy: OrderByDirection): Date
+    logFinish(orderBy: OrderByDirection): Boolean
+    logStart(orderBy: OrderByDirection): Boolean
+    methodName(orderBy: OrderByDirection): String
+    methodParamsXml(orderBy: OrderByDirection): String
+    period(orderBy: OrderByDirection): Int
+    permittedServers(orderBy: OrderByDirection): String
+    schedulingType(orderBy: OrderByDirection): String
+    scriptName(orderBy: OrderByDirection): String
+    singleton(orderBy: OrderByDirection): Boolean
+    startDate(orderBy: OrderByDirection): Date
+    startDelay(orderBy: OrderByDirection): Int
+    sysTenantId(orderBy: OrderByDirection): String
+    timeFrame(orderBy: OrderByDirection): Int
+    timeout(orderBy: OrderByDirection): Int
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    userName(orderBy: OrderByDirection): String
+}
+
+type sys_SendingAttachment {
+    content(orderBy: OrderByDirection): String
+    contentFile(createDate: Date, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, extension: String, id: UUID, name: String, orderBy: OrderByDirection, size: Long, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sys_FileDescriptor
+    contentId(orderBy: OrderByDirection): String
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    disposition(orderBy: OrderByDirection): String
+    encoding(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    message(address: String, attachmentsName: String, attemptsCount: Int, attemptsMade: Int, bcc: String, bodyContentType: String, caption: String, cc: String, contentText: String, createTs: Date, createdBy: String, dateSent: Date, deadline: Date, deleteTs: Date, deletedBy: String, from: String, headers: String, id: UUID, orderBy: OrderByDirection, status: Int, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sys_SendingMessage
+    name(orderBy: OrderByDirection): String
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_SendingMessage {
+    address(orderBy: OrderByDirection): String
+    attachments(orderBy: OrderByDirection): [sys_SendingAttachment]
+    attachmentsName(orderBy: OrderByDirection): String
+    attemptsCount(orderBy: OrderByDirection): Int
+    attemptsMade(orderBy: OrderByDirection): Int
+    bcc(orderBy: OrderByDirection): String
+    bodyContentType(orderBy: OrderByDirection): String
+    caption(orderBy: OrderByDirection): String
+    cc(orderBy: OrderByDirection): String
+    contentText(orderBy: OrderByDirection): String
+    contentTextFile(createDate: Date, createTs: Date, createdBy: String, deleteTs: Date, deletedBy: String, extension: String, id: UUID, name: String, orderBy: OrderByDirection, size: Long, sysTenantId: String, updateTs: Date, updatedBy: String, version: Int): sys_FileDescriptor
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    dateSent(orderBy: OrderByDirection): Date
+    deadline(orderBy: OrderByDirection): Date
+    deleteTs(orderBy: OrderByDirection): Date
+    deletedBy(orderBy: OrderByDirection): String
+    from(orderBy: OrderByDirection): String
+    headers(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    status(orderBy: OrderByDirection): Int
+    sysTenantId(orderBy: OrderByDirection): String
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+    version(orderBy: OrderByDirection): Int
+}
+
+type sys_Server {
+    createTs(orderBy: OrderByDirection): Date
+    createdBy(orderBy: OrderByDirection): String
+    data(orderBy: OrderByDirection): String
+    id(orderBy: OrderByDirection): UUID
+    name(orderBy: OrderByDirection): String
+    running(orderBy: OrderByDirection): Boolean
+    updateTs(orderBy: OrderByDirection): Date
+    updatedBy(orderBy: OrderByDirection): String
+}
+
+"Describes the direction (Ascending / Descending) to sort a field."
+enum OrderByDirection {
+    "Ascending"
+    ASC
+    "Descending"
+    DESC
+}
+
+"Built-in java.math.BigDecimal"
+scalar BigDecimal
+
+"Date type"
+scalar Date
+
+"Date type"
+scalar LocalDate
+
+"Date type"
+scalar LocalDateTime
+
+"Long type"
+scalar Long
+
+"UUID type"
+scalar UUID
