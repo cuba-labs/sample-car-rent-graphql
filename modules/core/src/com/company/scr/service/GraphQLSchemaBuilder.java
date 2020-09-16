@@ -66,16 +66,15 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
     GraphQLObjectType getQueryType(List<Class<? extends Entity>> classes) {
         GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("Query").description("All encompassing schema for this JPA environment");
 
-        // todo rework
-        List<GraphQLFieldDefinition> fieldsList = entityManager.getMetamodel().getEntities().stream()
+        // put jpa model to entityCache
+        entityManager.getMetamodel().getEntities().stream()
                 .filter(this::isNotIgnored)
-                .map(this::getQueryFieldDefinition)
-                .collect(Collectors.toList());
+                .forEach(this::buildObjectType);
 
         List<GraphQLFieldDefinition> fields = new ArrayList<>();
+
         classes.forEach(aClass -> {
-            EntityType entityType = entityManager.getMetamodel().getEntities().stream().filter(et -> et.getJavaType().equals(aClass)).findAny().get();
-            GraphQLType type = entityCache.get(entityType);
+            GraphQLType type = classCache.get(aClass);
 
             // query scr_Cars
             fields.add(
@@ -98,50 +97,17 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
         return queryType.build();
     }
 
-    GraphQLFieldDefinition getQueryFieldDefinition(EntityType<?> entityType) {
-        return GraphQLFieldDefinition.newFieldDefinition()
-                .name(convertType(entityType.getName()))
-//                .description(getSchemaDocumentation(entityType.getJavaType()))
-                .type(new GraphQLList(getObjectType(entityType)))
-//                .dataFetcher(new JpaDataFetcher(entityManager, entityType))
-//                .argument(entityType.getAttributes().stream().filter(this::isValidInput).filter(this::isNotIgnored).flatMap(this::getArgument).collect(Collectors.toList()))
-                .build();
-    }
-
-    private boolean isValidInput(Attribute attribute) {
-        return attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC ||
-                attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ELEMENT_COLLECTION ||
-                attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED;
-    }
-
-    private Stream<GraphQLArgument> getArgument(Attribute attribute) {
-        return getAttributeType(attribute)
-                .filter(type -> type instanceof GraphQLInputType)
-                .filter(type -> attribute.getPersistentAttributeType() != Attribute.PersistentAttributeType.EMBEDDED ||
-                        (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED && type instanceof GraphQLScalarType))
-                .map(type -> {
-                    String name = attribute.getName();
-
-                    return GraphQLArgument.newArgument()
-                            .name(name)
-                            .type((GraphQLInputType) type)
-                            .build();
-                });
-    }
-
-    GraphQLObjectType getObjectType(EntityType<?> entityType) {
+    void buildObjectType(EntityType<?> entityType) {
         if (entityCache.containsKey(entityType))
-            return entityCache.get(entityType);
+            return;
 
         GraphQLObjectType answer = GraphQLObjectType.newObject()
                 .name(entityType.getName().replaceAll("\\$", "_"))
-//                .description(getSchemaDocumentation(entityType.getJavaType()))
                 .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField).collect(Collectors.toList()))
                 .build();
 
         entityCache.put(entityType, answer);
-
-        return answer;
+        classCache.put(entityType.getJavaType(), answer);
     }
 
     private Stream<GraphQLFieldDefinition> getObjectField(Attribute attribute) {
@@ -264,7 +230,6 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
             setIdentityCoercing(answer);
 
             classCache.put(clazz, answer);
-
             return answer;
         }
 
@@ -290,24 +255,16 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
     private boolean isNotIgnored(Attribute attribute) {
         Class javaType = attribute.getJavaType();
         String attrName = attribute.getName();
-//        if (attrName.equals("content") || attrName.equals("tokenBytes") || attrName.equals("authenticationBytes")) {
-//            log.warn("isNotIgnored return false for attribute {}:{}", attrName, javaType);
-//            return false;
-//        }
-//
-        if (
-//                LocalTime.class.isAssignableFrom(javaType) ||
-//                || OffsetDateTime.class.isAssignableFrom(javaType) ||
-                ReferenceToEntity.class.isAssignableFrom(javaType)) {
+        // embedded not support now
+        if (ReferenceToEntity.class.isAssignableFrom(javaType)) {
             log.warn("isNotIgnored return false for attribute {}:{}", attrName, javaType);
             return false;
         }
-        return true; // isNotIgnored(entityType.getJavaType());
+        return true;
     }
 
     private boolean isNotIgnored(EntityType entityType) {
-//        log.warn("isNotIgnored entity type {}", entityType.getName());
-        return true; //isNotIgnored(entityType.getJavaType());
+        return true;
     }
 
     private String getSchemaDocumentation(Object o) {
