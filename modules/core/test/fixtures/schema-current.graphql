@@ -1,0 +1,472 @@
+directive @include(
+    "Included when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if`'argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Marks the field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+) on FIELD_DEFINITION | ENUM_VALUE
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+) on SCALAR
+
+"All encompassing schema for this JPA environment"
+type Query {
+    scr_CarById(id: String): scr_Car
+    scr_Cars: [scr_Car]
+    scr_GarageById(id: String): scr_Garage
+    scr_Garages: [scr_Garage]
+}
+
+type scr_AssociationM2MTestEntity {
+    datatypesTestEntities: [scr_DatatypesTestEntity]
+    id: UUID
+    name: String
+}
+
+type scr_AssociationM2OTestEntity {
+    id: UUID
+    name: String
+}
+
+type scr_AssociationO2MTestEntity {
+    datatypesTestEntity: scr_DatatypesTestEntity
+    id: UUID
+    name: String
+}
+
+type scr_AssociationO2OTestEntity {
+    datatypesTestEntity: scr_DatatypesTestEntity
+    deeplyNestedTestEntity: scr_DeeplyNestedTestEntity
+    id: UUID
+    name: String
+}
+
+type scr_BoringStringIdTestEntity {
+    description: String
+    id: String
+    uuid: UUID
+}
+
+type scr_Car {
+    carType: String
+    ecoRank: Int
+    garage: scr_Garage
+    id: UUID
+    manufactureDate: Date
+    manufacturer: String
+    maxPassengers: Int
+    mileage: Float
+    model: String
+    price: BigDecimal
+    purchaseDate: Date
+    regNumber: String
+    technicalCertificate: scr_TechnicalCertificate
+    wheelOnRight: Boolean
+}
+
+type scr_CarRent {
+    car: scr_Car
+    fromDate: Date
+    fromDateTime: Date
+    fromTime: Date
+    id: UUID
+}
+
+type scr_CompositionO2MTestEntity {
+    datatypesTestEntity: scr_DatatypesTestEntity
+    id: UUID
+    name: String
+    quantity: Int
+}
+
+type scr_CompositionO2OTestEntity {
+    id: UUID
+    name: String
+    nestedComposition: scr_DeeplyNestedTestEntity
+    quantity: Int
+}
+
+type scr_DatatypesTestEntity {
+    associationM2Mattr: [scr_AssociationM2MTestEntity]
+    associationM2Oattr: scr_AssociationM2OTestEntity
+    associationO2Mattr: [scr_AssociationO2MTestEntity]
+    associationO2Oattr: scr_AssociationO2OTestEntity
+    bigDecimalAttr: BigDecimal
+    booleanAttr: Boolean
+    byteArrayAttr: String
+    compositionO2Mattr: [scr_CompositionO2MTestEntity]
+    compositionO2Oattr: scr_CompositionO2OTestEntity
+    datatypesTestEntity3: scr_DatatypesTestEntity3
+    dateAttr: Date
+    dateTimeAttr: Date
+    doubleAttr: Float
+    enumAttr: String
+    id: UUID
+    intIdentityIdTestEntityAssociationO2OAttr: scr_IntIdentityIdTestEntity
+    integerAttr: Int
+    integerIdTestEntityAssociationM2MAttr: [scr_IntegerIdTestEntity]
+    localDateAttr: LocalDate
+    localDateTimeAttr: LocalDateTime
+    localTimeAttr: String
+    longAttr: Long
+    name: String
+    offsetDateTimeAttr: String
+    offsetTimeAttr: String
+    readOnlyStringAttr: String
+    stringAttr: String
+    stringIdTestEntityAssociationM2O: scr_StringIdTestEntity
+    stringIdTestEntityAssociationO2O: scr_StringIdTestEntity
+    timeAttr: Date
+    uuidAttr: UUID
+}
+
+type scr_DatatypesTestEntity2 {
+    datatypesTestEntityAttr: scr_DatatypesTestEntity
+    id: UUID
+    intIdentityIdTestEntityAttr: scr_IntIdentityIdTestEntity
+    integerIdTestEntityAttr: scr_IntegerIdTestEntity
+    stringIdTestEntityAttr: scr_StringIdTestEntity
+    weirdStringIdTestEntityAttr: scr_WeirdStringIdTestEntity
+}
+
+type scr_DatatypesTestEntity3 {
+    datatypesTestEntityAttr: [scr_DatatypesTestEntity]
+    id: UUID
+    intIdentityIdTestEntityAttr: [scr_IntIdentityIdTestEntity]
+    integerIdTestEntityAttr: [scr_IntegerIdTestEntity]
+    name: String
+    stringIdTestEntityAttr: [scr_StringIdTestEntity]
+    weirdStringIdTestEntityAttr: [scr_WeirdStringIdTestEntity]
+}
+
+type scr_DeeplyNestedTestEntity {
+    associationO2Oattr: scr_AssociationO2OTestEntity
+    id: UUID
+    name: String
+}
+
+type scr_FavoriteCar {
+    car: scr_Car
+    id: UUID
+    notes: String
+    user: scr_User
+}
+
+type scr_Garage {
+    address: String
+    capacity: Int
+    cars: [scr_Car]
+    id: UUID
+    name: String
+    personnel: [scr_User]
+    vanEntry: Boolean
+    workingHoursFrom: String
+    workingHoursTo: String
+}
+
+type scr_IntIdentityIdTestEntity {
+    datatypesTestEntity: scr_DatatypesTestEntity
+    datatypesTestEntity3: scr_DatatypesTestEntity3
+    description: String
+    id: Int
+}
+
+type scr_IntegerIdTestEntity {
+    datatypesTestEntities: [scr_DatatypesTestEntity]
+    datatypesTestEntity3: scr_DatatypesTestEntity3
+    description: String
+    id: Int
+}
+
+type scr_SparePart {
+    id: UUID
+    name: String
+    spareParts: scr_SparePart
+}
+
+type scr_StringIdTestEntity {
+    datatypesTestEntity: scr_DatatypesTestEntity
+    datatypesTestEntity3: scr_DatatypesTestEntity3
+    description: String
+    identifier: String
+    productCode: String
+}
+
+type scr_TechnicalCertificate {
+    car: scr_Car
+    certNumber: String
+    id: UUID
+}
+
+type scr_User {
+    active: Boolean
+    changePasswordAtNextLogon: Boolean
+    email: String
+    firstName: String
+    group: sec_Group
+    groupNames: String
+    id: UUID
+    ipMask: String
+    language: String
+    lastName: String
+    login: String
+    loginLowerCase: String
+    middleName: String
+    name: String
+    password: String
+    passwordEncryption: String
+    phone: String
+    position: String
+    substitutions: [sec_UserSubstitution]
+    sysTenantId: String
+    timeZone: String
+    timeZoneAuto: Boolean
+    userRoles: [sec_UserRole]
+}
+
+type scr_WeirdStringIdTestEntity {
+    datatypesTestEntity3: scr_DatatypesTestEntity3
+    description: String
+    id: String
+    identifier: String
+}
+
+type sec_Constraint {
+    checkType: String
+    code: String
+    entityName: String
+    filterXml: String
+    groovyScript: String
+    group: sec_Group
+    id: UUID
+    isActive: Boolean
+    joinClause: String
+    operationType: String
+    sysTenantId: String
+    whereClause: String
+}
+
+type sec_EntityLog {
+    changes: String
+    entity: String
+    entityInstanceName: String
+    eventTs: Date
+    id: UUID
+    sysTenantId: String
+    type: String
+    user: scr_User
+}
+
+type sec_Filter {
+    code: String
+    componentId: String
+    globalDefault: Boolean
+    id: UUID
+    name: String
+    sysTenantId: String
+    user: scr_User
+    xml: String
+}
+
+type sec_Group {
+    constraints: [sec_Constraint]
+    hierarchyList: [sec_GroupHierarchy]
+    id: UUID
+    name: String
+    parent: sec_Group
+    sessionAttributes: [sec_SessionAttribute]
+    sysTenantId: String
+}
+
+type sec_GroupHierarchy {
+    group: sec_Group
+    id: UUID
+    level: Int
+    parent: sec_Group
+    sysTenantId: String
+}
+
+type sec_LocalizedConstraintMessage {
+    entityName: String
+    id: UUID
+    operationType: String
+    values: String
+}
+
+type sec_LoggedAttribute {
+    entity: sec_LoggedEntity
+    id: UUID
+    name: String
+}
+
+type sec_LoggedEntity {
+    attributes: [sec_LoggedAttribute]
+    auto: Boolean
+    id: UUID
+    manual: Boolean
+    name: String
+}
+
+type sec_Permission {
+    id: UUID
+    role: sec_Role
+    target: String
+    type: Int
+    value: Int
+}
+
+type sec_Presentation {
+    autoSave: Boolean
+    componentId: String
+    id: UUID
+    name: String
+    sysTenantId: String
+    user: scr_User
+    xml: String
+}
+
+type sec_RememberMeToken {
+    id: UUID
+    token: String
+    user: scr_User
+}
+
+type sec_Role {
+    defaultRole: Boolean
+    description: String
+    id: UUID
+    locName: String
+    name: String
+    permissions: [sec_Permission]
+    securityScope: String
+    sysTenantId: String
+    type: Int
+}
+
+type sec_ScreenHistory {
+    caption: String
+    id: UUID
+    substitutedUser: scr_User
+    sysTenantId: String
+    url: String
+    user: scr_User
+}
+
+type sec_SearchFolder {
+    applyDefault: Boolean
+    entityType: String
+    filterComponentId: String
+    filterXml: String
+    id: UUID
+    isSet: Boolean
+    name: String
+    presentation: sec_Presentation
+    sortOrder: Int
+    sysTenantId: String
+    tabName: String
+    user: scr_User
+}
+
+type sec_SessionAttribute {
+    datatype: String
+    group: sec_Group
+    id: UUID
+    name: String
+    stringValue: String
+    sysTenantId: String
+}
+
+type sec_SessionLogEntry {
+    address: String
+    clientInfo: String
+    clientType: String
+    finishedTs: Date
+    id: UUID
+    lastAction: Int
+    server: String
+    sessionId: UUID
+    startedTs: Date
+    substitutedUser: scr_User
+    sysTenantId: String
+    user: scr_User
+    userData: String
+}
+
+type sec_User {
+    active: Boolean
+    changePasswordAtNextLogon: Boolean
+    email: String
+    firstName: String
+    group: sec_Group
+    groupNames: String
+    id: UUID
+    ipMask: String
+    language: String
+    lastName: String
+    login: String
+    loginLowerCase: String
+    middleName: String
+    name: String
+    password: String
+    passwordEncryption: String
+    position: String
+    substitutions: [sec_UserSubstitution]
+    sysTenantId: String
+    timeZone: String
+    timeZoneAuto: Boolean
+    userRoles: [sec_UserRole]
+}
+
+type sec_UserRole {
+    id: UUID
+    role: sec_Role
+    roleName: String
+    user: scr_User
+}
+
+type sec_UserSetting {
+    clientType: String
+    id: UUID
+    name: String
+    user: scr_User
+    value: String
+}
+
+type sec_UserSubstitution {
+    endDate: Date
+    id: UUID
+    startDate: Date
+    substitutedUser: scr_User
+    sysTenantId: String
+    user: scr_User
+}
+
+"Built-in java.math.BigDecimal"
+scalar BigDecimal
+
+"Date type"
+scalar Date
+
+"Date type"
+scalar LocalDate
+
+"Date type"
+scalar LocalDateTime
+
+"Long type"
+scalar Long
+
+"UUID type"
+scalar UUID
