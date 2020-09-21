@@ -1,5 +1,6 @@
 package com.company.scr.service;
 
+import com.company.scr.entity.Car;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.Folder;
@@ -25,9 +26,9 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
 
     private final Logger log = LoggerFactory.getLogger(GraphQLSchemaBuilder.class);
 
-    private final EntityManager entityManager;
     private final Map<EntityType, GraphQLObjectType> entityCache = new HashMap<>();
     private final Map<Class, GraphQLType> classCache = new HashMap<>();
+    private final Map<Class, GraphQLInputType> inputClassCache = new HashMap<>();
 
     private final List<AttributeMapper> attributeMappers = new ArrayList<>();
 
@@ -38,14 +39,36 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
      * @param entityManager The manager containing the data models to include in the final GraphQL schema.
      */
     public GraphQLSchemaBuilder(EntityManager entityManager, List<Class<? extends Entity>> classes) {
-        this.entityManager = entityManager;
         populateStandardAttributeMappers();
 
-        super.query(getQueryType(classes));
+        // put jpa model to entityCache
+        entityManager.getMetamodel().getEntities().stream()
+                .filter(this::isNotIgnored)
+                .forEach(this::buildObjectType);
 
         // add types to schema
-        entityCache.forEach((entityType, graphQLObjectType) -> super.additionalType(graphQLObjectType));
         super.additionalTypes(new HashSet<>(entityCache.values()));
+
+        // todo input types to schema
+        List<GraphQLInputObjectField> fields = new ArrayList<>();
+        fields.add(GraphQLInputObjectField.newInputObjectField()
+                .name("manufacturer")
+                .type(Scalars.GraphQLString)
+                .build());
+        GraphQLInputObjectType inputScrCar = GraphQLInputObjectType.newInputObject()
+                .name("input_scr_Car")
+                .fields(fields)
+                .build();
+
+        inputClassCache.put(Car.class, inputScrCar);
+        super.additionalType(inputScrCar);
+
+
+        // build query and add to schema
+        super.query(getQueryType(classes));
+
+        // build mutation and add to schema
+        super.mutation(getMutationType(Collections.singletonList(Car.class)));
     }
 
     private void populateStandardAttributeMappers() {
@@ -64,31 +87,52 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
         };
     }
 
+    GraphQLObjectType getMutationType(List<Class<? extends Entity>> classes) {
+        GraphQLObjectType.Builder qtBuilder = GraphQLObjectType.newObject().name("Mutation");
+        List<GraphQLFieldDefinition> fields = new ArrayList<>();
+
+        classes.forEach(aClass -> {
+            GraphQLInputType inputType = inputClassCache.get(aClass);
+            GraphQLOutputType outType = (GraphQLOutputType) classCache.get(aClass);
+
+            GraphQLArgument argument = GraphQLArgument.newArgument()
+                    .name(className(aClass))
+                    .type(inputType)
+                    .build();
+
+            // mutation createCar(car: scr_Car)
+            fields.add(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                            .name("create" + aClass.getSimpleName())
+                            .type(outType)
+                            .argument(argument)
+                            .build());
+        });
+
+        qtBuilder.fields(fields);
+        return qtBuilder.build();
+    }
 
     GraphQLObjectType getQueryType(List<Class<? extends Entity>> classes) {
-        GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("Query").description("All encompassing schema for this JPA environment");
-
-        // put jpa model to entityCache
-        entityManager.getMetamodel().getEntities().stream()
-                .filter(this::isNotIgnored)
-                .forEach(this::buildObjectType);
+        GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("Query")
+                .description("All encompassing schema for this JPA environment");
 
         List<GraphQLFieldDefinition> fields = new ArrayList<>();
 
         classes.forEach(aClass -> {
             GraphQLType type = classCache.get(aClass);
 
-            // query scr_Cars
+            // query 'cars'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
-                            .name("scr_" + aClass.getSimpleName() + "s")
+                            .name(className(aClass) + "s")
                             .type(new GraphQLList(type))
                             .build());
 
-            // query scr_CarById(id)
+            // query 'carById(id)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
-                            .name("scr_" + aClass.getSimpleName() + "ById")
+                            .name(className(aClass) + "ById")
                             .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
                             .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString).build())
                             .build());
@@ -266,5 +310,9 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
 
     private static String convertType(String name) {
         return name.replaceAll("\\$", "_");
+    }
+
+    private static String className(Class aClass) {
+        return aClass.getSimpleName().toLowerCase();
     }
 }

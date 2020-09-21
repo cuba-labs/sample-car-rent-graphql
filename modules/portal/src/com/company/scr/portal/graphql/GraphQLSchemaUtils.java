@@ -23,7 +23,6 @@ public class GraphQLSchemaUtils {
     }
 
     private static String className(Class aClass) {
-        return "scr_" + aClass.getSimpleName();
+        return aClass.getSimpleName().toLowerCase();
     }
-
 }
