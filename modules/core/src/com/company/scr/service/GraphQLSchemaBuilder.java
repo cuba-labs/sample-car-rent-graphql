@@ -51,12 +51,37 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
 
         // todo input types to schema
         List<GraphQLInputObjectField> fields = new ArrayList<>();
-        fields.add(GraphQLInputObjectField.newInputObjectField()
-                .name("manufacturer")
-                .type(Scalars.GraphQLString)
-                .build());
+
+//        type scr_Car {
+//            carType: String
+//            ecoRank: Int
+//            garage: scr_Garage
+//            id: UUID
+//            manufactureDate: Date
+//            manufacturer: String
+//            maxPassengers: Int
+//            mileage: Float
+//            model: String
+//            price: BigDecimal
+//            purchaseDate: Date
+//            regNumber: String
+//            technicalCertificate: scr_TechnicalCertificate
+//            wheelOnRight: Boolean
+//        }
+
+        fields.add(buildInputField("manufacturer", Scalars.GraphQLString, true));
+        fields.add(buildInputField("manufactureDate", JavaScalars.GraphQLDate));
+        fields.add(buildInputField("carType", Scalars.GraphQLString, true));
+        fields.add(buildInputField("maxPassengers", Scalars.GraphQLInt));
+        fields.add(buildInputField("mileage", Scalars.GraphQLFloat));
+        fields.add(buildInputField("model", Scalars.GraphQLString));
+        fields.add(buildInputField("price", Scalars.GraphQLBigDecimal));
+        fields.add(buildInputField("purchaseDate", JavaScalars.GraphQLDate));
+        fields.add(buildInputField("regNumber", Scalars.GraphQLString));
+        fields.add(buildInputField("wheelOnRight", Scalars.GraphQLBoolean));
+
         GraphQLInputObjectType inputScrCar = GraphQLInputObjectType.newInputObject()
-                .name("input_scr_Car")
+                .name("inp_scr_Car")
                 .fields(fields)
                 .build();
 
@@ -302,6 +327,17 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
             return false;
         };
         return true;
+    }
+
+    private static GraphQLInputObjectField buildInputField(String name, GraphQLInputType type, boolean required) {
+        return GraphQLInputObjectField.newInputObjectField()
+                .name(name)
+                .type(required ? GraphQLNonNull.nonNull(type) : type)
+                .build();
+    }
+
+    private static GraphQLInputObjectField buildInputField(String name, GraphQLInputType type) {
+        return buildInputField(name, type, false);
     }
 
     private String getSchemaDocumentation(Object o) {
