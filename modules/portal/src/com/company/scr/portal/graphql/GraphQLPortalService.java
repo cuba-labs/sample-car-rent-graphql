@@ -27,6 +27,8 @@ public class GraphQLPortalService {
     @Inject
     EntityDataFetcher entityDataFetcher;
     @Inject
+    EntityMutation entityMutation;
+    @Inject
     GraphQLService graphQLService;
 
     private GraphQL graphQL;
@@ -50,7 +52,7 @@ public class GraphQLPortalService {
                 .scalar(JavaScalars.GraphQLLocalDateTime)
                 .scalar(Scalars.GraphQLLong)
                 .scalar(Scalars.GraphQLBigDecimal);
-        GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, classes);
+        GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutation, classes);
 
         graphQLSchema = new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, rwBuilder.build());
 //        log.warn("graphQLSchema {}", new SchemaPrinter().print(graphQLSchema));
