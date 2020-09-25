@@ -22,15 +22,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
+public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
 
     private final Logger log = LoggerFactory.getLogger(GraphQLSchemaBuilder.class);
 
     private final Map<EntityType, GraphQLObjectType> entityCache = new HashMap<>();
     private final Map<Class, GraphQLType> classCache = new HashMap<>();
     private final Map<Class, GraphQLInputType> inputClassCache = new HashMap<>();
-
-    private final List<AttributeMapper> attributeMappers = new ArrayList<>();
 
     /**
      * Initialises the builder with the given {@link EntityManager} from which we immediately start to scan for
@@ -48,46 +46,7 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
 
         // add types to schema
         super.additionalTypes(new HashSet<>(entityCache.values()));
-
-        // todo input types to schema
-        List<GraphQLInputObjectField> fields = new ArrayList<>();
-
-//        type scr_Car {
-//            carType: String
-//            ecoRank: Int
-//            garage: scr_Garage
-//            id: UUID
-//            manufactureDate: Date
-//            manufacturer: String
-//            maxPassengers: Int
-//            mileage: Float
-//            model: String
-//            price: BigDecimal
-//            purchaseDate: Date
-//            regNumber: String
-//            technicalCertificate: scr_TechnicalCertificate
-//            wheelOnRight: Boolean
-//        }
-
-        fields.add(buildInputField("manufacturer", Scalars.GraphQLString, true));
-        fields.add(buildInputField("manufactureDate", JavaScalars.GraphQLDate));
-        fields.add(buildInputField("carType", Scalars.GraphQLString, true));
-        fields.add(buildInputField("maxPassengers", Scalars.GraphQLInt));
-        fields.add(buildInputField("mileage", Scalars.GraphQLFloat));
-        fields.add(buildInputField("model", Scalars.GraphQLString));
-        fields.add(buildInputField("price", Scalars.GraphQLBigDecimal));
-        fields.add(buildInputField("purchaseDate", JavaScalars.GraphQLDate));
-        fields.add(buildInputField("regNumber", Scalars.GraphQLString));
-        fields.add(buildInputField("wheelOnRight", Scalars.GraphQLBoolean));
-
-        GraphQLInputObjectType inputScrCar = GraphQLInputObjectType.newInputObject()
-                .name("inp_scr_Car")
-                .fields(fields)
-                .build();
-
-        inputClassCache.put(Car.class, inputScrCar);
-        super.additionalType(inputScrCar);
-
+        super.additionalTypes(new HashSet<>(inputClassCache.values()));
 
         // build query and add to schema
         super.query(getQueryType(classes));
@@ -177,8 +136,15 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
                 .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField).collect(Collectors.toList()))
                 .build();
 
+        List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getInputObjectField).collect(Collectors.toList());
+        GraphQLInputObjectType inpAnswer = GraphQLInputObjectType.newInputObject()
+                .name("inp_" + entityType.getName().replaceAll("\\$", "_"))
+                .fields(inputFields)
+                .build();
+
         entityCache.put(entityType, answer);
         classCache.put(entityType.getJavaType(), answer);
+        inputClassCache.put(entityType.getJavaType(), inpAnswer);
     }
 
     private Stream<GraphQLFieldDefinition> getObjectField(Attribute attribute) {
@@ -194,9 +160,9 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
                 });
     }
 
-    private Stream<Attribute> findBasicAttributes(Collection<Attribute> attributes) {
-        return attributes.stream().filter(this::isNotIgnored).filter(it -> it.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC);
-    }
+//    private Stream<Attribute> findBasicAttributes(Collection<Attribute> attributes) {
+//        return attributes.stream().filter(this::isNotIgnored).filter(it -> it.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC);
+//    }
 
     private Stream<GraphQLType> getAttributeType(Attribute attribute) {
         if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC) {
@@ -266,7 +232,7 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
                 "Class could not be mapped to GraphQL: '" + javaType.getClass().getTypeName() + "'");
     }
 
-    private GraphQLType getTypeFromJavaType(Class clazz) {
+    protected GraphQLType getTypeFromJavaType(Class clazz) {
         if (clazz.isEnum()) {
             if (classCache.containsKey(clazz))
                 return classCache.get(clazz);
@@ -338,14 +304,6 @@ public class GraphQLSchemaBuilder extends GraphQLSchema.Builder {
 
     private static GraphQLInputObjectField buildInputField(String name, GraphQLInputType type) {
         return buildInputField(name, type, false);
-    }
-
-    private String getSchemaDocumentation(Object o) {
-        return null;
-    }
-
-    private static String convertType(String name) {
-        return name.replaceAll("\\$", "_");
     }
 
     private static String className(Class aClass) {
