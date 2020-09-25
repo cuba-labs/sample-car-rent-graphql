@@ -1,6 +1,5 @@
 package com.company.scr.service;
 
-import com.company.scr.entity.Car;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.Folder;
@@ -52,7 +51,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         super.query(getQueryType(classes));
 
         // build mutation and add to schema
-        super.mutation(getMutationType(Collections.singletonList(Car.class)));
+        super.mutation(getMutationType(classes));
     }
 
     private void populateStandardAttributeMappers() {

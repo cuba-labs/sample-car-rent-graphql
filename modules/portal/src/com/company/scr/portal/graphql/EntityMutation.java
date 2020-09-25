@@ -1,7 +1,7 @@
 package com.company.scr.portal.graphql;
 
-import com.company.scr.entity.Car;
 import com.haulmont.cuba.core.app.serialization.EntitySerializationAPI;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Metadata;
 import graphql.schema.DataFetcher;
@@ -26,19 +26,17 @@ public class EntityMutation {
     @Inject
     private Metadata metadata;
 
-    public DataFetcher<Car> createEntity() {
+    public <E extends Entity> DataFetcher<E> createEntity(Class<E> entityClass) {
         return environment -> {
 
-            Map<String, String> input = environment.getArgument("car");
+            Map<String, String> input = environment.getArgument(entityClass.getSimpleName().toLowerCase());
             log.warn("createEntity input {}", input);
 
-            String carJson = new JSONObject(input).toString();
-            log.warn("createEntity carJson {}", carJson);
+            String entityJson = new JSONObject(input).toString();
+            log.warn("createEntity json {}", entityJson);
 
-            Car car = entitySerializationAPI.entityFromJson(carJson, metadata.getClass(Car.class));
-            dataManager.commit(car);
-
-            return car;
+            E entity = entitySerializationAPI.entityFromJson(entityJson, metadata.getClass(entityClass));
+            return dataManager.commit(entity, DataFetcherUtils.buildView(entityClass, environment));
         };
     }
 }

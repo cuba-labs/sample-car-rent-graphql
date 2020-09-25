@@ -22,7 +22,7 @@ public class GraphQLSchemaUtils {
             );
 
             rwBuilder.type("Mutation", typeWiring -> typeWiring
-                    .dataFetcher("createCar", entityMutation.createEntity())
+                    .dataFetcher("create" + aClass.getSimpleName(), entityMutation.createEntity(aClass))
             );
 
         });
