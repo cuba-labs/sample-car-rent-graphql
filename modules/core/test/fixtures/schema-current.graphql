@@ -1,3 +1,16 @@
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if`'argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
 directive @include(
     "Included when true."
     if: Boolean!
@@ -21,12 +34,24 @@ directive @specifiedBy(
     url: String!
 ) on SCALAR
 
+type Mutation {
+    createCar(car: inp_scr_Car): scr_Car
+    createGarage(garage: inp_scr_Garage): scr_Garage
+}
+
 "All encompassing schema for this JPA environment"
 type Query {
-    scr_CarById(id: String): scr_Car
-    scr_Cars: [scr_Car]
-    scr_GarageById(id: String): scr_Garage
-    scr_Garages: [scr_Garage]
+    carById(id: String): scr_Car
+    cars: [scr_Car]
+    garageById(id: String): scr_Garage
+    garages: [scr_Garage]
+}
+
+type datagen_GeneratedEntity {
+    entityName: String
+    id: UUID
+    instName: String
+    instanceId: String
 }
 
 type scr_AssociationM2MTestEntity {
@@ -470,3 +495,357 @@ scalar Long
 
 "UUID type"
 scalar UUID
+
+input inp_datagen_GeneratedEntity {
+    entityName: String
+    id: UUID
+    instName: String
+    instanceId: String
+}
+
+input inp_scr_AssociationM2MTestEntity {
+    id: UUID
+    name: String
+}
+
+input inp_scr_AssociationM2OTestEntity {
+    id: UUID
+    name: String
+}
+
+input inp_scr_AssociationO2MTestEntity {
+    id: UUID
+    name: String
+}
+
+input inp_scr_AssociationO2OTestEntity {
+    id: UUID
+    name: String
+}
+
+input inp_scr_BoringStringIdTestEntity {
+    description: String
+    id: String
+    uuid: UUID
+}
+
+input inp_scr_Car {
+    carType: String
+    ecoRank: Int
+    id: UUID
+    manufactureDate: Date
+    manufacturer: String
+    maxPassengers: Int
+    mileage: Float
+    model: String
+    price: BigDecimal
+    purchaseDate: Date
+    regNumber: String
+    wheelOnRight: Boolean
+}
+
+input inp_scr_CarRent {
+    fromDate: Date
+    fromDateTime: Date
+    fromTime: Date
+    id: UUID
+}
+
+input inp_scr_CompositionO2MTestEntity {
+    id: UUID
+    name: String
+    quantity: Int
+}
+
+input inp_scr_CompositionO2OTestEntity {
+    id: UUID
+    name: String
+    quantity: Int
+}
+
+input inp_scr_DatatypesTestEntity {
+    bigDecimalAttr: BigDecimal
+    booleanAttr: Boolean
+    byteArrayAttr: String
+    dateAttr: Date
+    dateTimeAttr: Date
+    doubleAttr: Float
+    enumAttr: String
+    id: UUID
+    integerAttr: Int
+    localDateAttr: LocalDate
+    localDateTimeAttr: LocalDateTime
+    localTimeAttr: String
+    longAttr: Long
+    name: String
+    offsetDateTimeAttr: String
+    offsetTimeAttr: String
+    readOnlyStringAttr: String
+    stringAttr: String
+    timeAttr: Date
+    uuidAttr: UUID
+}
+
+input inp_scr_DatatypesTestEntity2 {
+    id: UUID
+}
+
+input inp_scr_DatatypesTestEntity3 {
+    id: UUID
+    name: String
+}
+
+input inp_scr_DeeplyNestedTestEntity {
+    id: UUID
+    name: String
+}
+
+input inp_scr_FavoriteCar {
+    id: UUID
+    notes: String
+}
+
+input inp_scr_Garage {
+    address: String
+    capacity: Int
+    id: UUID
+    name: String
+    vanEntry: Boolean
+    workingHoursFrom: String
+    workingHoursTo: String
+}
+
+input inp_scr_IntIdentityIdTestEntity {
+    description: String
+    id: Int
+}
+
+input inp_scr_IntegerIdTestEntity {
+    description: String
+    id: Int
+}
+
+input inp_scr_SparePart {
+    id: UUID
+    name: String
+}
+
+input inp_scr_StringIdTestEntity {
+    description: String
+    identifier: String
+    productCode: String
+}
+
+input inp_scr_TechnicalCertificate {
+    certNumber: String
+    id: UUID
+}
+
+input inp_scr_User {
+    active: Boolean
+    changePasswordAtNextLogon: Boolean
+    email: String
+    firstName: String
+    groupNames: String
+    id: UUID
+    ipMask: String
+    language: String
+    lastName: String
+    login: String
+    loginLowerCase: String
+    middleName: String
+    name: String
+    password: String
+    passwordEncryption: String
+    phone: String
+    position: String
+    sysTenantId: String
+    timeZone: String
+    timeZoneAuto: Boolean
+}
+
+input inp_scr_WeirdStringIdTestEntity {
+    description: String
+    id: String
+    identifier: String
+}
+
+input inp_sec_Constraint {
+    checkType: String
+    code: String
+    entityName: String
+    filterXml: String
+    groovyScript: String
+    id: UUID
+    isActive: Boolean
+    joinClause: String
+    operationType: String
+    sysTenantId: String
+    whereClause: String
+}
+
+input inp_sec_EntityLog {
+    changes: String
+    entity: String
+    entityInstanceName: String
+    eventTs: Date
+    id: UUID
+    sysTenantId: String
+    type: String
+}
+
+input inp_sec_Filter {
+    code: String
+    componentId: String
+    globalDefault: Boolean
+    id: UUID
+    name: String
+    sysTenantId: String
+    xml: String
+}
+
+input inp_sec_Group {
+    id: UUID
+    name: String
+    sysTenantId: String
+}
+
+input inp_sec_GroupHierarchy {
+    id: UUID
+    level: Int
+    sysTenantId: String
+}
+
+input inp_sec_LocalizedConstraintMessage {
+    entityName: String
+    id: UUID
+    operationType: String
+    values: String
+}
+
+input inp_sec_LoggedAttribute {
+    id: UUID
+    name: String
+}
+
+input inp_sec_LoggedEntity {
+    auto: Boolean
+    id: UUID
+    manual: Boolean
+    name: String
+}
+
+input inp_sec_Permission {
+    id: UUID
+    target: String
+    type: Int
+    value: Int
+}
+
+input inp_sec_Presentation {
+    autoSave: Boolean
+    componentId: String
+    id: UUID
+    name: String
+    sysTenantId: String
+    xml: String
+}
+
+input inp_sec_RememberMeToken {
+    id: UUID
+    token: String
+}
+
+input inp_sec_Role {
+    defaultRole: Boolean
+    description: String
+    id: UUID
+    locName: String
+    name: String
+    securityScope: String
+    sysTenantId: String
+    type: Int
+}
+
+input inp_sec_ScreenHistory {
+    caption: String
+    id: UUID
+    sysTenantId: String
+    url: String
+}
+
+input inp_sec_SearchFolder {
+    applyDefault: Boolean
+    entityType: String
+    filterComponentId: String
+    filterXml: String
+    id: UUID
+    isSet: Boolean
+    name: String
+    sortOrder: Int
+    sysTenantId: String
+    tabName: String
+}
+
+input inp_sec_SessionAttribute {
+    datatype: String
+    id: UUID
+    name: String
+    stringValue: String
+    sysTenantId: String
+}
+
+input inp_sec_SessionLogEntry {
+    address: String
+    clientInfo: String
+    clientType: String
+    finishedTs: Date
+    id: UUID
+    lastAction: Int
+    server: String
+    sessionId: UUID
+    startedTs: Date
+    sysTenantId: String
+    userData: String
+}
+
+input inp_sec_User {
+    active: Boolean
+    changePasswordAtNextLogon: Boolean
+    email: String
+    firstName: String
+    groupNames: String
+    id: UUID
+    ipMask: String
+    language: String
+    lastName: String
+    login: String
+    loginLowerCase: String
+    middleName: String
+    name: String
+    password: String
+    passwordEncryption: String
+    position: String
+    sysTenantId: String
+    timeZone: String
+    timeZoneAuto: Boolean
+}
+
+input inp_sec_UserRole {
+    id: UUID
+    roleName: String
+}
+
+input inp_sec_UserSetting {
+    clientType: String
+    id: UUID
+    name: String
+    value: String
+}
+
+input inp_sec_UserSubstitution {
+    endDate: Date
+    id: UUID
+    startDate: Date
+    sysTenantId: String
+}
