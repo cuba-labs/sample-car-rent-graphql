@@ -1,11 +1,16 @@
 package com.company.scr.service;
 
+import com.haulmont.chile.core.annotations.Composition;
 import graphql.Scalars;
 import graphql.schema.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.metamodel.*;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.PluralAttribute;
+import javax.persistence.metamodel.SingularAttribute;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,47 +39,52 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
                 });
     }
 
-    private Stream<GraphQLInputType> getAttributeType(Attribute attribute) {
-        if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC) {
+    private Stream<GraphQLInputType> getAttributeType(Attribute metaAttr) {
+        Attribute.PersistentAttributeType persistentType = metaAttr.getPersistentAttributeType();
+        if (persistentType == Attribute.PersistentAttributeType.BASIC) {
             try {
-                return Stream.of(getBasicAttributeType(attribute.getJavaType()));
+                return Stream.of(getBasicAttributeType(metaAttr.getJavaType()));
             } catch (UnsupportedOperationException e) {
                 //fall through to the exception below
                 //which is more useful because it also contains the declaring member
             }
-//        } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ONE_TO_MANY || attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.MANY_TO_MANY) {
-//            EntityType foreignType = (EntityType) ((PluralAttribute) attribute).getElementType();
-//            return Stream.of(new GraphQLList(new GraphQLTypeReference(convertToInputType(foreignType.getName()))));
-//        } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.MANY_TO_ONE || attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ONE_TO_ONE) {
-//            EntityType foreignType = (EntityType) ((SingularAttribute) attribute).getType();
-//            String typeName = convertToInputType(foreignType.getName());
-//            GraphQLTypeReference typeReference = new GraphQLTypeReference(typeName);
-//            return Stream.of(typeReference);
-//        } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ELEMENT_COLLECTION) {
-//            Type foreignType = ((PluralAttribute) attribute).getElementType();
-//            return Stream.of(new GraphQLList(getTypeFromJavaType(foreignType.getJavaType())));
-//        } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED) {
-//            EmbeddableType<?> embeddableType = (EmbeddableType<?>) ((SingularAttribute<?, ?>) attribute).getType();
-//            return Stream.of(new GraphQLTypeReference(embeddableType.getJavaType().getSimpleName()));
+        }
+
+        Field field = getAttrJavaField(metaAttr);
+        if (field != null && field.getDeclaredAnnotation(Composition.class) != null) {
+
+            if (persistentType == Attribute.PersistentAttributeType.MANY_TO_ONE ||
+                    persistentType == Attribute.PersistentAttributeType.ONE_TO_ONE) {
+                EntityType foreignType = (EntityType) ((SingularAttribute) metaAttr).getType();
+                String typeName = convertToInputType(foreignType.getName());
+                GraphQLTypeReference typeReference = new GraphQLTypeReference(typeName);
+                return Stream.of(typeReference);
+            }
+
+            if (persistentType == Attribute.PersistentAttributeType.ONE_TO_MANY ||
+                    persistentType == Attribute.PersistentAttributeType.MANY_TO_MANY) {
+
+                EntityType foreignType = (EntityType) ((PluralAttribute) metaAttr).getElementType();
+                return Stream.of(new GraphQLList(new GraphQLTypeReference(convertToInputType(foreignType.getName()))));
+            }
         }
 
         // todo not sure how we will support relations in mutation
-        if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ONE_TO_MANY
-                || attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.MANY_TO_MANY
-                || attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.MANY_TO_ONE
-                || attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ONE_TO_ONE) {
+        if (persistentType == Attribute.PersistentAttributeType.ONE_TO_MANY
+                || persistentType == Attribute.PersistentAttributeType.MANY_TO_MANY
+                || persistentType == Attribute.PersistentAttributeType.MANY_TO_ONE
+                || persistentType == Attribute.PersistentAttributeType.ONE_TO_ONE) {
             return Stream.of((GraphQLInputType) null);
         }
 
 //        // todo temporary map all unsupported to String
-        Class classType = attribute.getDeclaringType().getJavaType();
-        Class attrType = attribute.getJavaType();
-        log.warn("attribute {} from class {} has unsupported type {}, temporary map to String", attribute.getName(), classType, attrType);
+        Class classType = metaAttr.getDeclaringType().getJavaType();
+        Class attrType = metaAttr.getJavaType();
+        log.warn("attribute {} from class {} has unsupported type {}, temporary map to String", metaAttr.getName(), classType, attrType);
         return Stream.of(new GraphQLTypeReference("String"));
 
 //        final String declaringType = attribute.getDeclaringType().getJavaType().getName(); // fully qualified name of the entity class
 //        final String declaringMember = attribute.getJavaMember().getName(); // field name in the entity class
-//
 //        throw new UnsupportedOperationException(
 //                "Attribute could not be mapped to GraphQL: field '" + declaringMember + "' of entity class '" + declaringType + "'");
     }
@@ -86,7 +96,7 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
                 .findFirst();
 
         if (customMapper.isPresent()) {
-                return (GraphQLInputType) (customMapper.get().getBasicAttributeType(javaType).get());
+            return (GraphQLInputType) (customMapper.get().getBasicAttributeType(javaType).get());
         } else if (String.class.isAssignableFrom(javaType))
             return Scalars.GraphQLString;
         else if (Integer.class.isAssignableFrom(javaType) || int.class.isAssignableFrom(javaType))
@@ -112,8 +122,23 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
                 "Class could not be mapped to GraphQL: '" + javaType.getClass().getTypeName() + "'");
     }
 
+    private static Field getAttrJavaField(Attribute metaAttr) {
+        Class attrOwnerJavaType = metaAttr.getDeclaringType().getJavaType();
+        Field field;
+        try {
+            field = attrOwnerJavaType.getDeclaredField(metaAttr.getName());
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+        return field;
+    }
+
     protected static String convertType(String name) {
         return name.replaceAll("\\$", "_");
+    }
+
+    private static String convertToInputType(String name) {
+        return "inp_" + name.replaceAll("\\$", "_");
     }
 
     protected String getSchemaDocumentation(Object o) {

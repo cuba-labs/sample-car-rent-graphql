@@ -2,6 +2,10 @@ package com.company.scr.portal.graphql;
 
 import com.company.scr.entity.Car;
 import com.company.scr.entity.Garage;
+import com.company.scr.entity.test.CompositionO2OTestEntity;
+import com.company.scr.entity.test.DatatypesTestEntity;
+import com.company.scr.entity.test.DatatypesTestEntity2;
+import com.company.scr.entity.test.DatatypesTestEntity3;
 import com.company.scr.service.GraphQLService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -37,7 +41,8 @@ public class GraphQLPortalService {
 
     private void initGql() {
 
-        Class[] classes = {Car.class, Garage.class};
+        Class[] classes = {Car.class, Garage.class, CompositionO2OTestEntity.class, DatatypesTestEntity.class,
+        DatatypesTestEntity2.class, DatatypesTestEntity3.class};
 
         String schemaInput = graphQLService.loadSchema(Arrays.asList(classes));
 //        log.warn("loadSchema: {}", schemaInput);

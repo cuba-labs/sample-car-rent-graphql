@@ -130,19 +130,21 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         if (entityCache.containsKey(entityType))
             return;
 
-        GraphQLObjectType answer = GraphQLObjectType.newObject()
+        GraphQLObjectType outAnswer = GraphQLObjectType.newObject()
                 .name(entityType.getName().replaceAll("\\$", "_"))
-                .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField).collect(Collectors.toList()))
-                .build();
+                .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField)
+                        .collect(Collectors.toList())).build();
 
-        List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getInputObjectField).collect(Collectors.toList());
+        List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored)
+                .flatMap(this::getInputObjectField).collect(Collectors.toList());
+
         GraphQLInputObjectType inpAnswer = GraphQLInputObjectType.newInputObject()
                 .name("inp_" + entityType.getName().replaceAll("\\$", "_"))
                 .fields(inputFields)
                 .build();
 
-        entityCache.put(entityType, answer);
-        classCache.put(entityType.getJavaType(), answer);
+        entityCache.put(entityType, outAnswer);
+        classCache.put(entityType.getJavaType(), outAnswer);
         inputClassCache.put(entityType.getJavaType(), inpAnswer);
     }
 
@@ -290,7 +292,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     private boolean isNotIgnored(EntityType entityType) {
         if (convertType(entityType.getName()).startsWith("sys_")) {
             return false;
-        };
+        }
         return true;
     }
 
