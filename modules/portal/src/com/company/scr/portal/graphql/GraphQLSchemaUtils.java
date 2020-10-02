@@ -11,7 +11,7 @@ public class GraphQLSchemaUtils {
                                                    CollectionDataFetcher collectionDataFetcher,
                                                    EntityDataFetcher entityDataFetcher,
                                                    EntityMutation entityMutation,
-                                                   Class<? extends Entity>... entityClasses) {
+                                                   Class<Entity>... entityClasses) {
 
         Arrays.stream(entityClasses).forEach(aClass -> {
             String className = className(aClass);
