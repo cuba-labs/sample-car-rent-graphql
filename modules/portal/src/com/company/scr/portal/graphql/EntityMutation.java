@@ -1,5 +1,6 @@
 package com.company.scr.portal.graphql;
 
+import com.google.gson.Gson;
 import com.haulmont.addon.restapi.api.exception.RestAPIException;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.importexport.EntityImportException;
@@ -17,10 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class EntityMutation {
@@ -61,6 +59,8 @@ public class EntityMutation {
 
         EntityImportView entityImportView = entityImportViewBuilderAPI.buildFromJson(entityJson, metaClass);
 
+        log.warn("createEntityFromJson: entityImportView \n{}", new Gson().toJson(printEntityView(entityImportView)));
+
         Collection<Entity> importedEntities;
         try {
             importedEntities = entityImportExportService.importEntities(Collections.singletonList(entity), entityImportView, true);
@@ -84,5 +84,15 @@ public class EntityMutation {
             mainEntity = importedEntities.iterator().next();
         }
         return mainEntity;
+    }
+
+    protected Object printEntityView(EntityImportView view) {
+        if (view == null) {
+            return "";
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        view.getProperties().forEach(prop -> map.put(prop.getName(), printEntityView(prop.getView())));
+        return map;
     }
 }
