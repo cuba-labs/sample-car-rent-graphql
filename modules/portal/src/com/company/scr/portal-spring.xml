@@ -29,5 +29,6 @@
     <bean class="com.company.scr.portal.graphql.GraphQLPortalService" name="graphqlServiceBean"/>
     <bean class="com.company.scr.portal.graphql.CollectionDataFetcher"/>
     <bean class="com.company.scr.portal.graphql.EntityDataFetcher"/>
-    <bean class="com.company.scr.portal.graphql.EntityMutation"/>
+    <bean class="com.company.scr.portal.graphql.EntityMutationResolver"/>
+    <bean class="com.company.scr.portal.graphql.MutationViewBuilder"/>
 </beans>

@@ -7,6 +7,7 @@ import com.company.scr.entity.test.DatatypesTestEntity;
 import com.company.scr.entity.test.DatatypesTestEntity2;
 import com.company.scr.entity.test.DatatypesTestEntity3;
 import com.company.scr.service.GraphQLService;
+import com.haulmont.cuba.security.entity.User;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.Scalars;
@@ -31,7 +32,7 @@ public class GraphQLPortalService {
     @Inject
     EntityDataFetcher entityDataFetcher;
     @Inject
-    EntityMutation entityMutation;
+    EntityMutationResolver entityMutationResolver;
     @Inject
     GraphQLService graphQLService;
 
@@ -42,7 +43,7 @@ public class GraphQLPortalService {
     private void initGql() {
 
         Class[] classes = {Car.class, Garage.class, CompositionO2OTestEntity.class, DatatypesTestEntity.class,
-        DatatypesTestEntity2.class, DatatypesTestEntity3.class};
+        DatatypesTestEntity2.class, DatatypesTestEntity3.class, User.class};
 
         String schemaInput = graphQLService.loadSchema(Arrays.asList(classes));
 //        log.warn("loadSchema: {}", schemaInput);
@@ -57,7 +58,7 @@ public class GraphQLPortalService {
                 .scalar(JavaScalars.GraphQLLocalDateTime)
                 .scalar(Scalars.GraphQLLong)
                 .scalar(Scalars.GraphQLBigDecimal);
-        GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutation, classes);
+        GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutationResolver, classes);
 
         graphQLSchema = new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, rwBuilder.build());
 //        log.warn("graphQLSchema {}", new SchemaPrinter().print(graphQLSchema));

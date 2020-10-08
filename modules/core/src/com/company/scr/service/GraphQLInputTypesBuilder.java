@@ -1,6 +1,5 @@
 package com.company.scr.service;
 
-import com.haulmont.chile.core.annotations.Composition;
 import graphql.Scalars;
 import graphql.schema.*;
 import org.slf4j.Logger;
@@ -50,9 +49,6 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
             }
         }
 
-        Field field = getAttrJavaField(metaAttr);
-        if (field != null && field.getDeclaredAnnotation(Composition.class) != null) {
-
             if (persistentType == Attribute.PersistentAttributeType.MANY_TO_ONE ||
                     persistentType == Attribute.PersistentAttributeType.ONE_TO_ONE) {
                 EntityType foreignType = (EntityType) ((SingularAttribute) metaAttr).getType();
@@ -67,15 +63,6 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
                 EntityType foreignType = (EntityType) ((PluralAttribute) metaAttr).getElementType();
                 return Stream.of(new GraphQLList(new GraphQLTypeReference(convertToInputType(foreignType.getName()))));
             }
-        }
-
-        // todo not sure how we will support relations in mutation
-        if (persistentType == Attribute.PersistentAttributeType.ONE_TO_MANY
-                || persistentType == Attribute.PersistentAttributeType.MANY_TO_MANY
-                || persistentType == Attribute.PersistentAttributeType.MANY_TO_ONE
-                || persistentType == Attribute.PersistentAttributeType.ONE_TO_ONE) {
-            return Stream.of((GraphQLInputType) null);
-        }
 
 //        // todo temporary map all unsupported to String
         Class classType = metaAttr.getDeclaringType().getJavaType();

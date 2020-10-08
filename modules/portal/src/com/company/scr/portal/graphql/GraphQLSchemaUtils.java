@@ -10,7 +10,7 @@ public class GraphQLSchemaUtils {
     public static void assignDataFetchers(RuntimeWiring.Builder rwBuilder,
                                                    CollectionDataFetcher collectionDataFetcher,
                                                    EntityDataFetcher entityDataFetcher,
-                                                   EntityMutation entityMutation,
+                                                   EntityMutationResolver entityMutationResolver,
                                                    Class<Entity>... entityClasses) {
 
         Arrays.stream(entityClasses).forEach(aClass -> {
@@ -22,7 +22,7 @@ public class GraphQLSchemaUtils {
             );
 
             rwBuilder.type("Mutation", typeWiring -> typeWiring
-                    .dataFetcher("create" + aClass.getSimpleName(), entityMutation.createEntity(aClass))
+                    .dataFetcher("create" + aClass.getSimpleName(), entityMutationResolver.createEntity(aClass))
             );
 
         });
