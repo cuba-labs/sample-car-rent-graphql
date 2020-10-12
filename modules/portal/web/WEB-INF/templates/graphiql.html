@@ -21,7 +21,7 @@
 
 <script>
       const graphQLFetcher = graphQLParams =>
-        fetch('http://localhost:8080/app-portal/graphiql-inner-query', {
+        fetch('http://localhost:8080/app-portal/graphql', {
           method: 'post',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(graphQLParams),

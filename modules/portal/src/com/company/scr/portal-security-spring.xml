@@ -12,7 +12,6 @@
     <!-- REST-API has separate spring-security configuration -->
     <http pattern="/resources/**" security="none"/>
     <http pattern="/graphiql" security="none"/>
-    <http pattern="/graphiql-inner-query" security="none"/>
     <http pattern="/graphql/**" security="none"/>
 
     <http auto-config="true"

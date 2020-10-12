@@ -43,25 +43,19 @@ public class PortalController {
         return "graphiql";
     }
 
-    @PostMapping("/graphiql-inner-query")
-    public ResponseEntity<Object> graphiqlInnerQuery(@RequestBody Map<String, String> requestBody) {
-        ExecutionResult result = graphQLPortalService.executeGraphQL(requestBody.get("query"));
-        ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(result);
-        log.info("graphiqlInnerQuery return {}", body);
-        return body;
-    }
-
     @PostMapping("/graphql")
-    public ResponseEntity<Object> graphql(@RequestBody String query) {
+    public ResponseEntity<Object> graphql(@RequestBody Map<String, String> requestBody) {
+        String query = requestBody.get("query");
+        log.warn("graphql query '{}'", query);
         ExecutionResult result = graphQLPortalService.executeGraphQL(query);
-        ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(result);
-        log.info("graphql return {}", body);
+        ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(result);
+        log.trace("graphql return {}", body);
         return body;
     }
 
     @GetMapping(value = "/graphql/schema")
     public ResponseEntity<String> schema() {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8)
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(graphQLPortalService.getSchema());
     }
 
