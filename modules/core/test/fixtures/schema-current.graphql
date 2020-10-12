@@ -36,15 +36,30 @@ directive @specifiedBy(
 
 type Mutation {
     createCar(car: inp_scr_Car): scr_Car
+    createCompositionO2OTestEntity(compositiono2otestentity: inp_scr_CompositionO2OTestEntity): scr_CompositionO2OTestEntity
+    createDatatypesTestEntity(datatypestestentity: inp_scr_DatatypesTestEntity): scr_DatatypesTestEntity
+    createDatatypesTestEntity2(datatypestestentity2: inp_scr_DatatypesTestEntity2): scr_DatatypesTestEntity2
+    createDatatypesTestEntity3(datatypestestentity3: inp_scr_DatatypesTestEntity3): scr_DatatypesTestEntity3
     createGarage(garage: inp_scr_Garage): scr_Garage
+    createUser(user: inp_sec_User): sec_User
 }
 
 "All encompassing schema for this JPA environment"
 type Query {
     carById(id: String): scr_Car
     cars: [scr_Car]
+    compositiono2otestentityById(id: String): scr_CompositionO2OTestEntity
+    compositiono2otestentitys: [scr_CompositionO2OTestEntity]
+    datatypestestentity2ById(id: String): scr_DatatypesTestEntity2
+    datatypestestentity2s: [scr_DatatypesTestEntity2]
+    datatypestestentity3ById(id: String): scr_DatatypesTestEntity3
+    datatypestestentity3s: [scr_DatatypesTestEntity3]
+    datatypestestentityById(id: String): scr_DatatypesTestEntity
+    datatypestestentitys: [scr_DatatypesTestEntity]
     garageById(id: String): scr_Garage
     garages: [scr_Garage]
+    userById(id: String): scr_User
+    users: [sec_User]
 }
 
 type datagen_GeneratedEntity {
@@ -504,6 +519,7 @@ input inp_datagen_GeneratedEntity {
 }
 
 input inp_scr_AssociationM2MTestEntity {
+    datatypesTestEntities: [inp_scr_DatatypesTestEntity]
     id: UUID
     name: String
 }
@@ -514,11 +530,14 @@ input inp_scr_AssociationM2OTestEntity {
 }
 
 input inp_scr_AssociationO2MTestEntity {
+    datatypesTestEntity: inp_scr_DatatypesTestEntity
     id: UUID
     name: String
 }
 
 input inp_scr_AssociationO2OTestEntity {
+    datatypesTestEntity: inp_scr_DatatypesTestEntity
+    deeplyNestedTestEntity: inp_scr_DeeplyNestedTestEntity
     id: UUID
     name: String
 }
@@ -532,6 +551,7 @@ input inp_scr_BoringStringIdTestEntity {
 input inp_scr_Car {
     carType: String
     ecoRank: Int
+    garage: inp_scr_Garage
     id: UUID
     manufactureDate: Date
     manufacturer: String
@@ -541,10 +561,12 @@ input inp_scr_Car {
     price: BigDecimal
     purchaseDate: Date
     regNumber: String
+    technicalCertificate: inp_scr_TechnicalCertificate
     wheelOnRight: Boolean
 }
 
 input inp_scr_CarRent {
+    car: inp_scr_Car
     fromDate: Date
     fromDateTime: Date
     fromTime: Date
@@ -552,6 +574,7 @@ input inp_scr_CarRent {
 }
 
 input inp_scr_CompositionO2MTestEntity {
+    datatypesTestEntity: inp_scr_DatatypesTestEntity
     id: UUID
     name: String
     quantity: Int
@@ -560,19 +583,29 @@ input inp_scr_CompositionO2MTestEntity {
 input inp_scr_CompositionO2OTestEntity {
     id: UUID
     name: String
+    nestedComposition: inp_scr_DeeplyNestedTestEntity
     quantity: Int
 }
 
 input inp_scr_DatatypesTestEntity {
+    associationM2Mattr: [inp_scr_AssociationM2MTestEntity]
+    associationM2Oattr: inp_scr_AssociationM2OTestEntity
+    associationO2Mattr: [inp_scr_AssociationO2MTestEntity]
+    associationO2Oattr: inp_scr_AssociationO2OTestEntity
     bigDecimalAttr: BigDecimal
     booleanAttr: Boolean
     byteArrayAttr: String
+    compositionO2Mattr: [inp_scr_CompositionO2MTestEntity]
+    compositionO2Oattr: inp_scr_CompositionO2OTestEntity
+    datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     dateAttr: Date
     dateTimeAttr: Date
     doubleAttr: Float
     enumAttr: String
     id: UUID
+    intIdentityIdTestEntityAssociationO2OAttr: inp_scr_IntIdentityIdTestEntity
     integerAttr: Int
+    integerIdTestEntityAssociationM2MAttr: [inp_scr_IntegerIdTestEntity]
     localDateAttr: LocalDate
     localDateTimeAttr: LocalDateTime
     localTimeAttr: String
@@ -582,45 +615,66 @@ input inp_scr_DatatypesTestEntity {
     offsetTimeAttr: String
     readOnlyStringAttr: String
     stringAttr: String
+    stringIdTestEntityAssociationM2O: inp_scr_StringIdTestEntity
+    stringIdTestEntityAssociationO2O: inp_scr_StringIdTestEntity
     timeAttr: Date
     uuidAttr: UUID
 }
 
 input inp_scr_DatatypesTestEntity2 {
+    datatypesTestEntityAttr: inp_scr_DatatypesTestEntity
     id: UUID
+    intIdentityIdTestEntityAttr: inp_scr_IntIdentityIdTestEntity
+    integerIdTestEntityAttr: inp_scr_IntegerIdTestEntity
+    stringIdTestEntityAttr: inp_scr_StringIdTestEntity
+    weirdStringIdTestEntityAttr: inp_scr_WeirdStringIdTestEntity
 }
 
 input inp_scr_DatatypesTestEntity3 {
+    datatypesTestEntityAttr: [inp_scr_DatatypesTestEntity]
     id: UUID
+    intIdentityIdTestEntityAttr: [inp_scr_IntIdentityIdTestEntity]
+    integerIdTestEntityAttr: [inp_scr_IntegerIdTestEntity]
     name: String
+    stringIdTestEntityAttr: [inp_scr_StringIdTestEntity]
+    weirdStringIdTestEntityAttr: [inp_scr_WeirdStringIdTestEntity]
 }
 
 input inp_scr_DeeplyNestedTestEntity {
+    associationO2Oattr: inp_scr_AssociationO2OTestEntity
     id: UUID
     name: String
 }
 
 input inp_scr_FavoriteCar {
+    car: inp_scr_Car
     id: UUID
     notes: String
+    user: inp_scr_User
 }
 
 input inp_scr_Garage {
     address: String
     capacity: Int
+    cars: [inp_scr_Car]
     id: UUID
     name: String
+    personnel: [inp_scr_User]
     vanEntry: Boolean
     workingHoursFrom: String
     workingHoursTo: String
 }
 
 input inp_scr_IntIdentityIdTestEntity {
+    datatypesTestEntity: inp_scr_DatatypesTestEntity
+    datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     id: Int
 }
 
 input inp_scr_IntegerIdTestEntity {
+    datatypesTestEntities: [inp_scr_DatatypesTestEntity]
+    datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     id: Int
 }
@@ -628,15 +682,19 @@ input inp_scr_IntegerIdTestEntity {
 input inp_scr_SparePart {
     id: UUID
     name: String
+    spareParts: inp_scr_SparePart
 }
 
 input inp_scr_StringIdTestEntity {
+    datatypesTestEntity: inp_scr_DatatypesTestEntity
+    datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     identifier: String
     productCode: String
 }
 
 input inp_scr_TechnicalCertificate {
+    car: inp_scr_Car
     certNumber: String
     id: UUID
 }
@@ -646,6 +704,7 @@ input inp_scr_User {
     changePasswordAtNextLogon: Boolean
     email: String
     firstName: String
+    group: inp_sec_Group
     groupNames: String
     id: UUID
     ipMask: String
@@ -659,12 +718,15 @@ input inp_scr_User {
     passwordEncryption: String
     phone: String
     position: String
+    substitutions: [inp_sec_UserSubstitution]
     sysTenantId: String
     timeZone: String
     timeZoneAuto: Boolean
+    userRoles: [inp_sec_UserRole]
 }
 
 input inp_scr_WeirdStringIdTestEntity {
+    datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     id: String
     identifier: String
@@ -676,6 +738,7 @@ input inp_sec_Constraint {
     entityName: String
     filterXml: String
     groovyScript: String
+    group: inp_sec_Group
     id: UUID
     isActive: Boolean
     joinClause: String
@@ -692,6 +755,7 @@ input inp_sec_EntityLog {
     id: UUID
     sysTenantId: String
     type: String
+    user: inp_scr_User
 }
 
 input inp_sec_Filter {
@@ -701,18 +765,25 @@ input inp_sec_Filter {
     id: UUID
     name: String
     sysTenantId: String
+    user: inp_scr_User
     xml: String
 }
 
 input inp_sec_Group {
+    constraints: [inp_sec_Constraint]
+    hierarchyList: [inp_sec_GroupHierarchy]
     id: UUID
     name: String
+    parent: inp_sec_Group
+    sessionAttributes: [inp_sec_SessionAttribute]
     sysTenantId: String
 }
 
 input inp_sec_GroupHierarchy {
+    group: inp_sec_Group
     id: UUID
     level: Int
+    parent: inp_sec_Group
     sysTenantId: String
 }
 
@@ -724,11 +795,13 @@ input inp_sec_LocalizedConstraintMessage {
 }
 
 input inp_sec_LoggedAttribute {
+    entity: inp_sec_LoggedEntity
     id: UUID
     name: String
 }
 
 input inp_sec_LoggedEntity {
+    attributes: [inp_sec_LoggedAttribute]
     auto: Boolean
     id: UUID
     manual: Boolean
@@ -737,6 +810,7 @@ input inp_sec_LoggedEntity {
 
 input inp_sec_Permission {
     id: UUID
+    role: inp_sec_Role
     target: String
     type: Int
     value: Int
@@ -748,12 +822,14 @@ input inp_sec_Presentation {
     id: UUID
     name: String
     sysTenantId: String
+    user: inp_scr_User
     xml: String
 }
 
 input inp_sec_RememberMeToken {
     id: UUID
     token: String
+    user: inp_scr_User
 }
 
 input inp_sec_Role {
@@ -762,6 +838,7 @@ input inp_sec_Role {
     id: UUID
     locName: String
     name: String
+    permissions: [inp_sec_Permission]
     securityScope: String
     sysTenantId: String
     type: Int
@@ -770,8 +847,10 @@ input inp_sec_Role {
 input inp_sec_ScreenHistory {
     caption: String
     id: UUID
+    substitutedUser: inp_scr_User
     sysTenantId: String
     url: String
+    user: inp_scr_User
 }
 
 input inp_sec_SearchFolder {
@@ -782,13 +861,16 @@ input inp_sec_SearchFolder {
     id: UUID
     isSet: Boolean
     name: String
+    presentation: inp_sec_Presentation
     sortOrder: Int
     sysTenantId: String
     tabName: String
+    user: inp_scr_User
 }
 
 input inp_sec_SessionAttribute {
     datatype: String
+    group: inp_sec_Group
     id: UUID
     name: String
     stringValue: String
@@ -805,7 +887,9 @@ input inp_sec_SessionLogEntry {
     server: String
     sessionId: UUID
     startedTs: Date
+    substitutedUser: inp_scr_User
     sysTenantId: String
+    user: inp_scr_User
     userData: String
 }
 
@@ -814,6 +898,7 @@ input inp_sec_User {
     changePasswordAtNextLogon: Boolean
     email: String
     firstName: String
+    group: inp_sec_Group
     groupNames: String
     id: UUID
     ipMask: String
@@ -826,20 +911,25 @@ input inp_sec_User {
     password: String
     passwordEncryption: String
     position: String
+    substitutions: [inp_sec_UserSubstitution]
     sysTenantId: String
     timeZone: String
     timeZoneAuto: Boolean
+    userRoles: [inp_sec_UserRole]
 }
 
 input inp_sec_UserRole {
     id: UUID
+    role: inp_sec_Role
     roleName: String
+    user: inp_scr_User
 }
 
 input inp_sec_UserSetting {
     clientType: String
     id: UUID
     name: String
+    user: inp_scr_User
     value: String
 }
 
@@ -847,5 +937,7 @@ input inp_sec_UserSubstitution {
     endDate: Date
     id: UUID
     startDate: Date
+    substitutedUser: inp_scr_User
     sysTenantId: String
+    user: inp_scr_User
 }
