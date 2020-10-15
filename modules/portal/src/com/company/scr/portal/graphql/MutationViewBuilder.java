@@ -68,7 +68,8 @@ public class MutationViewBuilder {
                             }
                         } else {
                             MetaClass propertyMetaClass = metadata.getClass(propertyType);
-                            if (metaProperty.getType() == MetaProperty.Type.COMPOSITION) {
+                            if (metaProperty.getType() == MetaProperty.Type.COMPOSITION
+                                    || metaProperty.getType() == MetaProperty.Type.ASSOCIATION) {
                                 JsonElement propertyJsonObject = entry.getValue();
                                 if (security.isEntityAttrUpdatePermitted(metaClass, propertyName)) {
                                     if (propertyJsonObject.isJsonNull()) {
@@ -107,7 +108,8 @@ public class MutationViewBuilder {
                                     view.addManyToManyProperty(propertyName, ReferenceImportBehaviour.ERROR_ON_MISSING, CollectionImportPolicy.REMOVE_ABSENT_ITEMS);
                                 break;
                             case ONE_TO_MANY:
-//                                if (metaProperty.getType() == MetaProperty.Type.COMPOSITION) {
+                                if (metaProperty.getType() == MetaProperty.Type.COMPOSITION
+                                || metaProperty.getType() == MetaProperty.Type.ASSOCIATION) {
                                     JsonElement compositionJsonArray = entry.getValue();
                                     if (!compositionJsonArray.isJsonArray()) {
                                         throw new RuntimeException("JsonArray was expected for property " + propertyName);
@@ -115,7 +117,7 @@ public class MutationViewBuilder {
                                     EntityImportView propertyImportView = buildFromJsonArray(compositionJsonArray.getAsJsonArray(), propertyMetaClass);
                                     if (security.isEntityAttrUpdatePermitted(metaClass, propertyName))
                                         view.addOneToManyProperty(propertyName, propertyImportView, CollectionImportPolicy.REMOVE_ABSENT_ITEMS);
-//                                }
+                                }
                                 break;
                             default:
                                 // ignore other options
