@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
 
+    private static final String TYPE_REF_STRING = "String";
+    private static final String CLIENT_ID_NAME = "clientId";
     private final Logger log = LoggerFactory.getLogger(GraphQLInputTypesBuilder.class);
 
     protected final List<AttributeMapper> attributeMappers = new ArrayList<>();
@@ -27,6 +29,12 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
     protected GraphQLInputObjectType buildInputType(EntityType<?> entityType) {
         List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored)
                 .flatMap(this::getInputObjectField).collect(Collectors.toList());
+
+        // add clientId
+        inputFields.add(GraphQLInputObjectField.newInputObjectField()
+                .name(CLIENT_ID_NAME)
+                .type(new GraphQLTypeReference(TYPE_REF_STRING))
+                .build());
 
         GraphQLInputObjectType inputType = GraphQLInputObjectType.newInputObject()
                 .name("inp_" + entityType.getName().replaceAll("\\$", "_"))
@@ -79,7 +87,7 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
         Class classType = metaAttr.getDeclaringType().getJavaType();
         Class attrType = metaAttr.getJavaType();
         log.warn("attribute {} from class {} has unsupported type {}, temporary map to String", metaAttr.getName(), classType, attrType);
-        return Stream.of(new GraphQLTypeReference("String"));
+        return Stream.of(new GraphQLTypeReference(TYPE_REF_STRING));
 
 //        final String declaringType = attribute.getDeclaringType().getJavaType().getName(); // fully qualified name of the entity class
 //        final String declaringMember = attribute.getJavaMember().getName(); // field name in the entity class
