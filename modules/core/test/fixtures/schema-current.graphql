@@ -512,6 +512,7 @@ scalar Long
 scalar UUID
 
 input inp_datagen_GeneratedEntity {
+    clientId: String
     entityName: String
     id: UUID
     instName: String
@@ -519,23 +520,27 @@ input inp_datagen_GeneratedEntity {
 }
 
 input inp_scr_AssociationM2MTestEntity {
+    clientId: String
     datatypesTestEntities: [inp_scr_DatatypesTestEntity]
     id: UUID
     name: String
 }
 
 input inp_scr_AssociationM2OTestEntity {
+    clientId: String
     id: UUID
     name: String
 }
 
 input inp_scr_AssociationO2MTestEntity {
+    clientId: String
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     id: UUID
     name: String
 }
 
 input inp_scr_AssociationO2OTestEntity {
+    clientId: String
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     deeplyNestedTestEntity: inp_scr_DeeplyNestedTestEntity
     id: UUID
@@ -543,6 +548,7 @@ input inp_scr_AssociationO2OTestEntity {
 }
 
 input inp_scr_BoringStringIdTestEntity {
+    clientId: String
     description: String
     id: String
     uuid: UUID
@@ -550,6 +556,7 @@ input inp_scr_BoringStringIdTestEntity {
 
 input inp_scr_Car {
     carType: String
+    clientId: String
     ecoRank: Int
     garage: inp_scr_Garage
     id: UUID
@@ -567,6 +574,7 @@ input inp_scr_Car {
 
 input inp_scr_CarRent {
     car: inp_scr_Car
+    clientId: String
     fromDate: Date
     fromDateTime: Date
     fromTime: Date
@@ -574,6 +582,7 @@ input inp_scr_CarRent {
 }
 
 input inp_scr_CompositionO2MTestEntity {
+    clientId: String
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     id: UUID
     name: String
@@ -581,6 +590,7 @@ input inp_scr_CompositionO2MTestEntity {
 }
 
 input inp_scr_CompositionO2OTestEntity {
+    clientId: String
     id: UUID
     name: String
     nestedComposition: inp_scr_DeeplyNestedTestEntity
@@ -595,6 +605,7 @@ input inp_scr_DatatypesTestEntity {
     bigDecimalAttr: BigDecimal
     booleanAttr: Boolean
     byteArrayAttr: String
+    clientId: String
     compositionO2Mattr: [inp_scr_CompositionO2MTestEntity]
     compositionO2Oattr: inp_scr_CompositionO2OTestEntity
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
@@ -622,6 +633,7 @@ input inp_scr_DatatypesTestEntity {
 }
 
 input inp_scr_DatatypesTestEntity2 {
+    clientId: String
     datatypesTestEntityAttr: inp_scr_DatatypesTestEntity
     id: UUID
     intIdentityIdTestEntityAttr: inp_scr_IntIdentityIdTestEntity
@@ -631,6 +643,7 @@ input inp_scr_DatatypesTestEntity2 {
 }
 
 input inp_scr_DatatypesTestEntity3 {
+    clientId: String
     datatypesTestEntityAttr: [inp_scr_DatatypesTestEntity]
     id: UUID
     intIdentityIdTestEntityAttr: [inp_scr_IntIdentityIdTestEntity]
@@ -642,12 +655,14 @@ input inp_scr_DatatypesTestEntity3 {
 
 input inp_scr_DeeplyNestedTestEntity {
     associationO2Oattr: inp_scr_AssociationO2OTestEntity
+    clientId: String
     id: UUID
     name: String
 }
 
 input inp_scr_FavoriteCar {
     car: inp_scr_Car
+    clientId: String
     id: UUID
     notes: String
     user: inp_scr_User
@@ -657,6 +672,7 @@ input inp_scr_Garage {
     address: String
     capacity: Int
     cars: [inp_scr_Car]
+    clientId: String
     id: UUID
     name: String
     personnel: [inp_scr_User]
@@ -666,6 +682,7 @@ input inp_scr_Garage {
 }
 
 input inp_scr_IntIdentityIdTestEntity {
+    clientId: String
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
@@ -673,6 +690,7 @@ input inp_scr_IntIdentityIdTestEntity {
 }
 
 input inp_scr_IntegerIdTestEntity {
+    clientId: String
     datatypesTestEntities: [inp_scr_DatatypesTestEntity]
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
@@ -680,12 +698,14 @@ input inp_scr_IntegerIdTestEntity {
 }
 
 input inp_scr_SparePart {
+    clientId: String
     id: UUID
     name: String
     spareParts: inp_scr_SparePart
 }
 
 input inp_scr_StringIdTestEntity {
+    clientId: String
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
@@ -696,12 +716,14 @@ input inp_scr_StringIdTestEntity {
 input inp_scr_TechnicalCertificate {
     car: inp_scr_Car
     certNumber: String
+    clientId: String
     id: UUID
 }
 
 input inp_scr_User {
     active: Boolean
     changePasswordAtNextLogon: Boolean
+    clientId: String
     email: String
     firstName: String
     group: inp_sec_Group
@@ -726,6 +748,7 @@ input inp_scr_User {
 }
 
 input inp_scr_WeirdStringIdTestEntity {
+    clientId: String
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     id: String
@@ -734,6 +757,7 @@ input inp_scr_WeirdStringIdTestEntity {
 
 input inp_sec_Constraint {
     checkType: String
+    clientId: String
     code: String
     entityName: String
     filterXml: String
@@ -749,6 +773,7 @@ input inp_sec_Constraint {
 
 input inp_sec_EntityLog {
     changes: String
+    clientId: String
     entity: String
     entityInstanceName: String
     eventTs: Date
@@ -759,6 +784,7 @@ input inp_sec_EntityLog {
 }
 
 input inp_sec_Filter {
+    clientId: String
     code: String
     componentId: String
     globalDefault: Boolean
@@ -770,6 +796,7 @@ input inp_sec_Filter {
 }
 
 input inp_sec_Group {
+    clientId: String
     constraints: [inp_sec_Constraint]
     hierarchyList: [inp_sec_GroupHierarchy]
     id: UUID
@@ -780,6 +807,7 @@ input inp_sec_Group {
 }
 
 input inp_sec_GroupHierarchy {
+    clientId: String
     group: inp_sec_Group
     id: UUID
     level: Int
@@ -788,6 +816,7 @@ input inp_sec_GroupHierarchy {
 }
 
 input inp_sec_LocalizedConstraintMessage {
+    clientId: String
     entityName: String
     id: UUID
     operationType: String
@@ -795,6 +824,7 @@ input inp_sec_LocalizedConstraintMessage {
 }
 
 input inp_sec_LoggedAttribute {
+    clientId: String
     entity: inp_sec_LoggedEntity
     id: UUID
     name: String
@@ -803,12 +833,14 @@ input inp_sec_LoggedAttribute {
 input inp_sec_LoggedEntity {
     attributes: [inp_sec_LoggedAttribute]
     auto: Boolean
+    clientId: String
     id: UUID
     manual: Boolean
     name: String
 }
 
 input inp_sec_Permission {
+    clientId: String
     id: UUID
     role: inp_sec_Role
     target: String
@@ -818,6 +850,7 @@ input inp_sec_Permission {
 
 input inp_sec_Presentation {
     autoSave: Boolean
+    clientId: String
     componentId: String
     id: UUID
     name: String
@@ -827,12 +860,14 @@ input inp_sec_Presentation {
 }
 
 input inp_sec_RememberMeToken {
+    clientId: String
     id: UUID
     token: String
     user: inp_scr_User
 }
 
 input inp_sec_Role {
+    clientId: String
     defaultRole: Boolean
     description: String
     id: UUID
@@ -846,6 +881,7 @@ input inp_sec_Role {
 
 input inp_sec_ScreenHistory {
     caption: String
+    clientId: String
     id: UUID
     substitutedUser: inp_scr_User
     sysTenantId: String
@@ -855,6 +891,7 @@ input inp_sec_ScreenHistory {
 
 input inp_sec_SearchFolder {
     applyDefault: Boolean
+    clientId: String
     entityType: String
     filterComponentId: String
     filterXml: String
@@ -869,6 +906,7 @@ input inp_sec_SearchFolder {
 }
 
 input inp_sec_SessionAttribute {
+    clientId: String
     datatype: String
     group: inp_sec_Group
     id: UUID
@@ -879,6 +917,7 @@ input inp_sec_SessionAttribute {
 
 input inp_sec_SessionLogEntry {
     address: String
+    clientId: String
     clientInfo: String
     clientType: String
     finishedTs: Date
@@ -896,6 +935,7 @@ input inp_sec_SessionLogEntry {
 input inp_sec_User {
     active: Boolean
     changePasswordAtNextLogon: Boolean
+    clientId: String
     email: String
     firstName: String
     group: inp_sec_Group
@@ -919,6 +959,7 @@ input inp_sec_User {
 }
 
 input inp_sec_UserRole {
+    clientId: String
     id: UUID
     role: inp_sec_Role
     roleName: String
@@ -926,6 +967,7 @@ input inp_sec_UserRole {
 }
 
 input inp_sec_UserSetting {
+    clientId: String
     clientType: String
     id: UUID
     name: String
@@ -934,6 +976,7 @@ input inp_sec_UserSetting {
 }
 
 input inp_sec_UserSubstitution {
+    clientId: String
     endDate: Date
     id: UUID
     startDate: Date
