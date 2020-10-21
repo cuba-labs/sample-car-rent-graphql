@@ -1,9 +1,6 @@
 package com.company.scr.service;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.entity.Folder;
-import com.haulmont.cuba.core.entity.ReferenceToEntity;
 import graphql.Scalars;
 import graphql.schema.*;
 import org.crygier.graphql.IdentityCoercing;
@@ -135,17 +132,11 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                 .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField)
                         .collect(Collectors.toList())).build();
 
-        List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored)
-                .flatMap(this::getInputObjectField).collect(Collectors.toList());
-
-        GraphQLInputObjectType inpAnswer = GraphQLInputObjectType.newInputObject()
-                .name("inp_" + entityType.getName().replaceAll("\\$", "_"))
-                .fields(inputFields)
-                .build();
+        GraphQLInputObjectType inputType = buildInputType(entityType);
 
         entityCache.put(entityType, outAnswer);
         classCache.put(entityType.getJavaType(), outAnswer);
-        inputClassCache.put(entityType.getJavaType(), inpAnswer);
+        inputClassCache.put(entityType.getJavaType(), inputType);
     }
 
     private Stream<GraphQLFieldDefinition> getObjectField(Attribute attribute) {
@@ -266,27 +257,6 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         } catch (Exception e) {
             log.error("Unable to set coercing for " + type, e);
         }
-    }
-
-
-    private boolean isNotIgnored(Attribute attribute) {
-        Class javaType = attribute.getJavaType();
-        String attrName = attribute.getName();
-        // embedded and other which not support now
-        if (ReferenceToEntity.class.isAssignableFrom(javaType)
-                || Folder.class.isAssignableFrom(javaType)
-                || FileDescriptor.class.isAssignableFrom(javaType)) {
-            log.warn("isNotIgnored return false for attribute {}:{}", attrName, javaType);
-            return false;
-        }
-
-        //noinspection RedundantIfStatement
-        if (Arrays.asList("createTs", "updateTs", "deleteTs", "createdBy", "updatedBy", "deletedBy", "version")
-                .contains(attrName)) {
-            return false;
-        }
-
-        return true;
     }
 
     private boolean isNotIgnored(EntityType entityType) {

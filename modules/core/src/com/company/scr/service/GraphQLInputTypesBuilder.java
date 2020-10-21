@@ -1,5 +1,8 @@
 package com.company.scr.service;
 
+import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.entity.Folder;
+import com.haulmont.cuba.core.entity.ReferenceToEntity;
 import graphql.Scalars;
 import graphql.schema.*;
 import org.slf4j.Logger;
@@ -9,12 +12,9 @@ import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
@@ -24,7 +24,18 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
     protected final List<AttributeMapper> attributeMappers = new ArrayList<>();
 
 
-    protected Stream<GraphQLInputObjectField> getInputObjectField(Attribute attribute) {
+    protected GraphQLInputObjectType buildInputType(EntityType<?> entityType) {
+        List<GraphQLInputObjectField> inputFields = entityType.getAttributes().stream().filter(this::isNotIgnored)
+                .flatMap(this::getInputObjectField).collect(Collectors.toList());
+
+        GraphQLInputObjectType inputType = GraphQLInputObjectType.newInputObject()
+                .name("inp_" + entityType.getName().replaceAll("\\$", "_"))
+                .fields(inputFields)
+                .build();
+        return inputType;
+    }
+
+    private Stream<GraphQLInputObjectField> getInputObjectField(Attribute attribute) {
 
         return getAttributeType(attribute)
                 .filter(Objects::nonNull)
@@ -109,19 +120,28 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
                 "Class could not be mapped to GraphQL: '" + javaType.getClass().getTypeName() + "'");
     }
 
-    private static Field getAttrJavaField(Attribute metaAttr) {
-        Class attrOwnerJavaType = metaAttr.getDeclaringType().getJavaType();
-        Field field;
-        try {
-            field = attrOwnerJavaType.getDeclaredField(metaAttr.getName());
-        } catch (NoSuchFieldException e) {
-            return null;
-        }
-        return field;
-    }
-
     protected static String convertType(String name) {
         return name.replaceAll("\\$", "_");
+    }
+
+    protected boolean isNotIgnored(Attribute attribute) {
+        Class javaType = attribute.getJavaType();
+        String attrName = attribute.getName();
+        // embedded and other which not support now
+        if (ReferenceToEntity.class.isAssignableFrom(javaType)
+                || Folder.class.isAssignableFrom(javaType)
+                || FileDescriptor.class.isAssignableFrom(javaType)) {
+            log.warn("isNotIgnored return false for attribute {}:{}", attrName, javaType);
+            return false;
+        }
+
+        //noinspection RedundantIfStatement
+        if (Arrays.asList("createTs", "updateTs", "deleteTs", "createdBy", "updatedBy", "deletedBy", "version")
+                .contains(attrName)) {
+            return false;
+        }
+
+        return true;
     }
 
     private static String convertToInputType(String name) {
