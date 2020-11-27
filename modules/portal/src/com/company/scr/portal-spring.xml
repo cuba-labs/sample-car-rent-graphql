@@ -31,4 +31,6 @@
     <bean class="com.company.scr.portal.graphql.EntityDataFetcher"/>
     <bean class="com.company.scr.portal.graphql.EntityMutationResolver"/>
     <bean class="com.company.scr.portal.graphql.MutationViewBuilder"/>
+    <bean id="cuba_EntitySerialization" class="com.company.scr.service.GraphQLEntitySerialization"/>
+
 </beans>
