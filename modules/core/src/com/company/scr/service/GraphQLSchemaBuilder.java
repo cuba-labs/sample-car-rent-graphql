@@ -3,7 +3,6 @@ package com.company.scr.service;
 import com.haulmont.cuba.core.entity.Entity;
 import graphql.Scalars;
 import graphql.schema.*;
-import org.crygier.graphql.IdentityCoercing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

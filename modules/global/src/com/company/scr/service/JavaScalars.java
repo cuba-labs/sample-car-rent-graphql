@@ -20,7 +20,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 public class JavaScalars {
-    static final Logger log = LoggerFactory.getLogger(org.crygier.graphql.JavaScalars.class);
+    static final Logger log = LoggerFactory.getLogger(JavaScalars.class);
 
     public static GraphQLScalarType GraphQLLocalDateTime = new GraphQLScalarType("LocalDateTime", "Date type", new Coercing() {
         @Override
