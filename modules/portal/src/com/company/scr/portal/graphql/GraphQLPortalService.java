@@ -49,13 +49,11 @@ public class GraphQLPortalService {
 //        log.warn("loadSchema: {}", schemaInput);
         TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(schemaInput);
 
-        // Provide API (gql queries) for entities listed below
+        // Scalars here are used for convert mutation input into server data
 
         RuntimeWiring.Builder rwBuilder = RuntimeWiring.newRuntimeWiring();
         rwBuilder.scalar(JavaScalars.GraphQLUUID)
                 .scalar(JavaScalars.GraphQLDate)
-                .scalar(JavaScalars.GraphQLLocalDate)
-                .scalar(JavaScalars.GraphQLLocalDateTime)
                 .scalar(Scalars.GraphQLLong)
                 .scalar(Scalars.GraphQLBigDecimal);
         GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutationResolver, classes);
