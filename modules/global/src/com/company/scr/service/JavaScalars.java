@@ -8,6 +8,7 @@ import graphql.schema.GraphQLScalarType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,7 +16,11 @@ public class JavaScalars {
 
     static final Logger log = LoggerFactory.getLogger(JavaScalars.class);
 
+    public static final SimpleDateFormat CUBA_SERIALIZATION_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+
     public static GraphQLScalarType GraphQLDate = new DateScalar();
+    public static GraphQLScalarType GraphQLLocalDateTime = new LocalDateTimeScalar();
 
     public static GraphQLScalarType GraphQLInstant = new GraphQLScalarType("Instant", "Date type", new Coercing<Instant, Long>() {
 

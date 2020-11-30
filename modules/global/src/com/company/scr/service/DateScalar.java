@@ -7,21 +7,20 @@ import graphql.schema.GraphQLScalarType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-public class DateScalar extends GraphQLScalarType{
+import static com.company.scr.service.JavaScalars.CUBA_SERIALIZATION_DATE_FORMAT;
 
-    public static final SimpleDateFormat CUBA_SERIALIZATION_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+public class DateScalar extends GraphQLScalarType{
 
     static final Logger log = LoggerFactory.getLogger(DateScalar.class);
 
 
     public DateScalar() {
-        super("LocalDateTime", "Date type", new Coercing() {
+        super("Date", "Date type", new Coercing() {
 
             @Override
             public Object serialize(Object input) {

@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.metamodel.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,11 +54,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     private void populateStandardAttributeMappers() {
         attributeMappers.add(createStandardAttributeMapper(UUID.class, JavaScalars.GraphQLUUID));
         attributeMappers.add(createStandardAttributeMapper(Date.class, JavaScalars.GraphQLDate));
-        attributeMappers.add(createStandardAttributeMapper(Instant.class, JavaScalars.GraphQLInstant));
-
-        // todo check
-//        attributeMappers.add(createStandardAttributeMapper(LocalDate.class, ExtendedScalars.DateTime));
-//        attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, ExtendedScalars.DateTime));
+        attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLLocalDateTime));
     }
 
     private AttributeMapper createStandardAttributeMapper(final Class<?> assignableClass, final GraphQLType type) {
