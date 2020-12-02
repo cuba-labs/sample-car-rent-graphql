@@ -264,17 +264,6 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         return true;
     }
 
-    private static GraphQLInputObjectField buildInputField(String name, GraphQLInputType type, boolean required) {
-        return GraphQLInputObjectField.newInputObjectField()
-                .name(name)
-                .type(required ? GraphQLNonNull.nonNull(type) : type)
-                .build();
-    }
-
-    private static GraphQLInputObjectField buildInputField(String name, GraphQLInputType type) {
-        return buildInputField(name, type, false);
-    }
-
     private static String className(Class aClass) {
         return aClass.getSimpleName().toLowerCase();
     }

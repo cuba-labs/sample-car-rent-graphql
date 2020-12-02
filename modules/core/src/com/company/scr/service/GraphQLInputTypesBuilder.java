@@ -8,10 +8,14 @@ import graphql.schema.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Column;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,14 +49,26 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
 
     private Stream<GraphQLInputObjectField> getInputObjectField(Attribute attribute) {
 
+        Member javaMember = attribute.getJavaMember();
+
+        // define, if attribute should be marked as required
+        boolean mandatory;
+        if (AnnotatedElement.class.isAssignableFrom(javaMember.getClass())) {
+            Annotation[] annotations = ((AnnotatedElement) javaMember).getAnnotations();
+            mandatory = Arrays.stream(annotations)
+                    .anyMatch(annotation -> Column.class.isAssignableFrom(annotation.getClass()) && !((Column) annotation).nullable());
+        } else {
+            throw new UnsupportedOperationException("Can't read annotations from " + javaMember.getClass());
+        }
+
         return getAttributeType(attribute)
                 .filter(Objects::nonNull)
                 .map(type -> {
                     String name = attribute.getName();
                     return GraphQLInputObjectField.newInputObjectField()
                             .name(name)
-                            .description(getSchemaDocumentation(attribute.getJavaMember()))
-                            .type(type)
+                            .description(getSchemaDocumentation(javaMember))
+                            .type(mandatory ? GraphQLNonNull.nonNull(type) : type)
                             .build();
                 });
     }
