@@ -5,6 +5,8 @@ import com.haulmont.cuba.core.app.importexport.EntityImportExportService;
 import com.haulmont.cuba.core.app.importexport.EntityImportView;
 import com.haulmont.cuba.core.app.serialization.EntitySerializationAPI;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.entity.contracts.Id;
+import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Metadata;
 import graphql.schema.DataFetcher;
 import org.json.JSONObject;
@@ -13,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class EntityMutationResolver {
@@ -31,6 +30,8 @@ public class EntityMutationResolver {
     private MutationViewBuilder mutationViewBuilder;
     @Inject
     private EntityImportExportService entityImportExportService;
+    @Inject
+    protected DataManager dataManager;
 
     public DataFetcher<Entity> createEntity(Class<Entity> entityClass) {
         return environment -> {
@@ -48,6 +49,16 @@ public class EntityMutationResolver {
             log.warn("createEntity: view {}", entityImportView);
             Collection<Entity> entities = entityImportExportService.importEntities(Collections.singletonList(entity), entityImportView);
             return entities.stream().filter(e -> e.getId().equals(entity.getId())).findAny().get();
+        };
+    }
+
+    public DataFetcher deleteEntity(Class<Entity> entityClass) {
+        return environment -> {
+            UUID id = environment.getArgument("id");
+            log.warn("deleteEntity: id {}", id);
+            Id entityId = Id.of(id, entityClass);
+            dataManager.remove(entityId);
+            return null;
         };
     }
 

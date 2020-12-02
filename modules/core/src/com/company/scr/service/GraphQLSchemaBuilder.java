@@ -55,6 +55,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         attributeMappers.add(createStandardAttributeMapper(UUID.class, JavaScalars.GraphQLUUID));
         attributeMappers.add(createStandardAttributeMapper(Date.class, JavaScalars.GraphQLDate));
         attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLLocalDateTime));
+        attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLVoid));
     }
 
     private AttributeMapper createStandardAttributeMapper(final Class<?> assignableClass, final GraphQLType type) {
@@ -73,9 +74,9 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             GraphQLInputType inputType = inputClassCache.get(aClass);
             GraphQLOutputType outType = (GraphQLOutputType) classCache.get(aClass);
 
-            GraphQLArgument argument = GraphQLArgument.newArgument()
+            GraphQLArgument createEntityArgument = GraphQLArgument.newArgument()
                     .name(className(aClass))
-                    .type(inputType)
+                    .type(GraphQLNonNull.nonNull(inputType))
                     .build();
 
             // mutation createCar(car: scr_Car)
@@ -83,7 +84,20 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("create" + aClass.getSimpleName())
                             .type(outType)
-                            .argument(argument)
+                            .argument(createEntityArgument)
+                            .build());
+
+            GraphQLArgument deleteEntityArgument = GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(GraphQLNonNull.nonNull(new GraphQLTypeReference("UUID")))
+                    .build();
+
+            // mutation deleteCar(id: UUID)
+            fields.add(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                            .name("delete" + aClass.getSimpleName())
+                            .type(JavaScalars.GraphQLVoid)
+                            .argument(deleteEntityArgument)
                             .build());
         });
 

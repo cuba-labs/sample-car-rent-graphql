@@ -25,6 +25,10 @@ public class GraphQLSchemaUtils {
                     .dataFetcher("create" + aClass.getSimpleName(), entityMutationResolver.createEntity(aClass))
             );
 
+            rwBuilder.type("Mutation", typeWiring -> typeWiring
+                    .dataFetcher("delete" + aClass.getSimpleName(), entityMutationResolver.deleteEntity(aClass))
+            );
+
         });
     }
 

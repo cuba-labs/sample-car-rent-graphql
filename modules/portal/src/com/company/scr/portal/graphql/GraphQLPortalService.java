@@ -55,6 +55,7 @@ public class GraphQLPortalService {
         rwBuilder.scalar(JavaScalars.GraphQLUUID)
                 .scalar(JavaScalars.GraphQLDate)
                 .scalar(JavaScalars.GraphQLLocalDateTime)
+                .scalar(JavaScalars.GraphQLVoid)
                 .scalar(Scalars.GraphQLLong)
                 .scalar(Scalars.GraphQLBigDecimal);
         GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutationResolver, classes);

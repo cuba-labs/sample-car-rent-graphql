@@ -1,15 +1,11 @@
 package com.company.scr.service;
 
-import graphql.language.IntValue;
 import graphql.language.StringValue;
-import graphql.schema.Coercing;
-import graphql.schema.CoercingSerializeException;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.UUID;
 
 public class JavaScalars {
@@ -21,38 +17,6 @@ public class JavaScalars {
 
     public static GraphQLScalarType GraphQLDate = new DateScalar();
     public static GraphQLScalarType GraphQLLocalDateTime = new LocalDateTimeScalar();
-
-    public static GraphQLScalarType GraphQLInstant = new GraphQLScalarType("Instant", "Date type", new Coercing<Instant, Long>() {
-
-        @Override
-        public Long serialize(Object input) {
-            if (input instanceof Instant) {
-                return ((Instant) input).getEpochSecond();
-            }
-            throw new CoercingSerializeException(
-                    "Expected type 'Instant' but was '" + input.getClass().getSimpleName() + "'.");
-        }
-
-        @Override
-        public Instant parseValue(Object input) {
-            if (input instanceof Long) {
-                return Instant.ofEpochSecond((Long) input);
-            } else if (input instanceof Integer) {
-                return Instant.ofEpochSecond((Integer) input);
-            }
-            throw new CoercingSerializeException(
-                    "Expected type 'Long' or 'Integer' but was '" + input.getClass().getSimpleName() + "'.");
-        }
-
-        @Override
-        public Instant parseLiteral(Object input) {
-            if (input instanceof IntValue) {
-                return Instant.ofEpochSecond(((IntValue) input).getValue().longValue());
-            }
-            return null;
-        }
-
-    });
 
     public static GraphQLScalarType GraphQLUUID = new GraphQLScalarType("UUID", "UUID type", new Coercing() {
 
@@ -87,6 +51,23 @@ public class JavaScalars {
                 log.warn("Failed to parse UUID from input: " + input, e);
                 return null;
             }
+        }
+    });
+
+    public static GraphQLScalarType GraphQLVoid = new GraphQLScalarType("Void", "Void type", new Coercing() {
+        @Override
+        public Object serialize(Object dataFetcherResult) throws CoercingSerializeException {
+            return null;
+        }
+
+        @Override
+        public Object parseValue(Object input) throws CoercingParseValueException {
+            return null;
+        }
+
+        @Override
+        public Object parseLiteral(Object input) throws CoercingParseLiteralException {
+            return null;
         }
     });
 }
