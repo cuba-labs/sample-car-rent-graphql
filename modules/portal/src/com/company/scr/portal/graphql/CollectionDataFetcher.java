@@ -30,4 +30,11 @@ public class CollectionDataFetcher {
         };
     }
 
+    public DataFetcher countEntities(Class entityClass) {
+        return environment -> {
+            LoadContext<? extends Entity> lc = new LoadContext<>(entityClass);
+            return dataManager.getCount(lc);
+        };
+    }
+
 }

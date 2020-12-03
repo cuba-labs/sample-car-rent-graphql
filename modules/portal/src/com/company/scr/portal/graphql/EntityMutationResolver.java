@@ -62,13 +62,4 @@ public class EntityMutationResolver {
         };
     }
 
-    protected Object printEntityView(EntityImportView view) {
-        if (view == null) {
-            return "";
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        view.getProperties().forEach(prop -> map.put(prop.getName(), printEntityView(prop.getView())));
-        return map;
-    }
 }

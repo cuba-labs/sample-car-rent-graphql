@@ -129,6 +129,13 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                             .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString).build())
                             .build());
 
+            // query 'countCars()'
+            fields.add(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                            .name("count" + aClass.getSimpleName() + "s")
+                            .type(Scalars.GraphQLLong)
+                            .build());
+
         });
 
         queryType.fields(fields);
