@@ -41,6 +41,9 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         super.additionalTypes(new HashSet<>(entityCache.values()));
         super.additionalTypes(new HashSet<>(inputClassCache.values()));
 
+        // enum type for order
+        super.additionalType(GraphQLTypes.SortOrder);
+
         // build query and add to schema
         super.query(getQueryType(classes));
 
@@ -114,11 +117,15 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         classes.forEach(aClass -> {
             GraphQLType type = classCache.get(aClass);
 
-            // query 'cars'
+            // query 'cars(sortBy, sortOrder)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(className(aClass) + "s")
                             .type(new GraphQLList(type))
+                            .argument(GraphQLArgument.newArgument()
+                                    .name(GraphQLConstants.SORT_BY).type(GraphQLTypeReference.typeRef("String")))
+                            .argument(GraphQLArgument.newArgument()
+                                    .name(GraphQLConstants.SORT_ORDER).type(GraphQLTypes.SortOrder))
                             .build());
 
             // query 'carById(id)'
@@ -126,7 +133,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(className(aClass) + "ById")
                             .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
-                            .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString).build())
+                            .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
                             .build());
 
             // query 'countCars()'
