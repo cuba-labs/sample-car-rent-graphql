@@ -31,13 +31,19 @@ public class CollectionDataFetcher {
             String sortOrder = environment.getArgument(GraphQLConstants.SORT_ORDER);
             String sortBy = environment.getArgument(GraphQLConstants.SORT_BY);
 
+            Integer limit = environment.getArgument(GraphQLConstants.LIMIT);
+            Integer offset = environment.getArgument(GraphQLConstants.OFFSET);
+
+            LoadContext.Query query = LoadContext.createQuery("");
             if (StringUtils.isNotBlank(sortBy)) {
                 Sort sort = StringUtils.isNotBlank(sortOrder)
                         ? Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)
                         : Sort.by(sortBy);
-
-                lc.setQuery(LoadContext.createQuery("").setSort(sort));
+                query.setSort(sort);
             }
+            lc.setQuery(query
+                    .setFirstResult(offset != null ? offset : 0)
+                    .setMaxResults(limit != null ? limit : 0));
 
             log.warn("loadList {} order by {} {}", lc, sortBy, sortOrder);
             return dataManager.loadList(lc);

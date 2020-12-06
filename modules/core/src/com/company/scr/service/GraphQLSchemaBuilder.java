@@ -117,13 +117,14 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         classes.forEach(aClass -> {
             GraphQLType type = classCache.get(aClass);
 
-            // query 'cars(sortBy, sortOrder)'
+            // query 'cars(limit, offset, sortBy, sortOrder)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(className(aClass) + "s")
                             .type(new GraphQLList(type))
-                            .argument(GraphQLArgument.newArgument()
-                                    .name(GraphQLConstants.SORT_BY).type(GraphQLTypeReference.typeRef("String")))
+                            .argument(arg(GraphQLConstants.LIMIT, "Int"))
+                            .argument(arg(GraphQLConstants.OFFSET, "Int"))
+                            .argument(arg(GraphQLConstants.SORT_BY, "String"))
                             .argument(GraphQLArgument.newArgument()
                                     .name(GraphQLConstants.SORT_ORDER).type(GraphQLTypes.SortOrder))
                             .build());
@@ -295,4 +296,16 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     private static String className(Class aClass) {
         return aClass.getSimpleName().toLowerCase();
     }
+
+    /**
+     * Shortcut for query argument builder
+     * @param name argument name
+     * @param typeRef argument type reference
+     * @return
+     */
+    private GraphQLArgument.Builder arg(String name, String typeRef) {
+        return GraphQLArgument.newArgument()
+                .name(name).type(GraphQLTypeReference.typeRef(typeRef));
+    }
+
 }
