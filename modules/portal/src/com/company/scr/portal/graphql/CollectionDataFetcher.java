@@ -45,25 +45,27 @@ public class CollectionDataFetcher {
             Integer limit = environment.getArgument(GraphQLConstants.LIMIT);
             Integer offset = environment.getArgument(GraphQLConstants.OFFSET);
 
-            // todo implement graphql type mapper that leave filter as plain string (not convert to Map) or returns RestFilterParseResult
-            String filterJson =  new Gson().toJson((Object) environment.getArgument(GraphQLConstants.FILTER));
             MetaClass metadataClass = metadata.getClass(entityClass);
-            RestFilterParseResult filterParseResult;
-            try {
-                filterParseResult = restFilterParser.parse(filterJson, metadataClass);
-            } catch (RestFilterParseException e) {
-                throw new UnsupportedOperationException("Cannot parse entities filter" + e.getMessage(), e);
-            }
-
-            String jpqlWhere = filterParseResult.getJpqlWhere();
-            Map<String, Object> queryParameters = filterParseResult.getQueryParameters();
-
             String queryString = "select e from " + metadataClass.getName() + " e";
 
-            if (jpqlWhere != null) {
-                queryString += " where " + jpqlWhere.replace("{E}", "e");
+            Map<String, Object> queryParameters = null;
+            // todo implement graphql type mapper that leave filter as plain string (not convert to Map) or returns RestFilterParseResult
+            Object filterArg = environment.getArgument(GraphQLConstants.FILTER);
+            if (filterArg != null) {
+                RestFilterParseResult filterParseResult;
+                try {
+                    filterParseResult = restFilterParser.parse(new Gson().toJson(filterArg), metadataClass);
+                } catch (RestFilterParseException e) {
+                    throw new UnsupportedOperationException("Cannot parse entities filter" + e.getMessage(), e);
+                }
+
+                String jpqlWhere = filterParseResult.getJpqlWhere();
+                queryParameters = filterParseResult.getQueryParameters();
+
+                if (jpqlWhere != null) {
+                    queryString += " where " + jpqlWhere.replace("{E}", "e");
+                }
             }
-            log.warn("queryString {}", queryString);
 
             LoadContext.Query query = LoadContext.createQuery(queryString);
             if (queryParameters != null) {
