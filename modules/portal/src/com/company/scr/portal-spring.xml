@@ -32,5 +32,7 @@
     <bean class="com.company.scr.portal.graphql.EntityMutationResolver"/>
     <bean class="com.company.scr.portal.graphql.MutationViewBuilder"/>
     <bean id="cuba_EntitySerialization" class="com.company.scr.service.GraphQLEntitySerialization"/>
+    <bean id="restapi_RestFilterParser" class="com.haulmont.addon.restapi.api.service.filter.RestFilterParser"/>
+    <bean id="restapi_OpManager" class="com.haulmont.addon.restapi.api.service.filter.RestFilterOpManagerImpl"/>
 
 </beans>

@@ -1,9 +1,15 @@
 package com.company.scr.portal.graphql;
 
 import com.company.scr.service.GraphQLConstants;
+import com.google.gson.Gson;
+import com.haulmont.addon.restapi.api.service.filter.RestFilterParseException;
+import com.haulmont.addon.restapi.api.service.filter.RestFilterParseResult;
+import com.haulmont.addon.restapi.api.service.filter.RestFilterParser;
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Sort;
 import graphql.schema.DataFetcher;
 import org.junit.platform.commons.util.StringUtils;
@@ -13,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CollectionDataFetcher {
@@ -21,12 +28,16 @@ public class CollectionDataFetcher {
 
     @Inject
     protected DataManager dataManager;
+    @Inject
+    private RestFilterParser restFilterParser;
+    @Inject
+    private Metadata metadata;
 
     public <E extends Entity> DataFetcher<List<E>> loadEntities(Class<E> entityClass) {
         return environment -> {
 
             LoadContext<E> lc = new LoadContext<>(entityClass);
-            lc.setView(DataFetcherUtils.buildView(entityClass,environment));
+            lc.setView(DataFetcherUtils.buildView(entityClass, environment));
 
             String sortOrder = environment.getArgument(GraphQLConstants.SORT_ORDER);
             String sortBy = environment.getArgument(GraphQLConstants.SORT_BY);
@@ -34,7 +45,31 @@ public class CollectionDataFetcher {
             Integer limit = environment.getArgument(GraphQLConstants.LIMIT);
             Integer offset = environment.getArgument(GraphQLConstants.OFFSET);
 
-            LoadContext.Query query = LoadContext.createQuery("");
+            // todo implement graphql type mapper that leave filter as plain string (not convert to Map) or returns RestFilterParseResult
+            String filterJson =  new Gson().toJson((Object) environment.getArgument(GraphQLConstants.FILTER));
+            MetaClass metadataClass = metadata.getClass(entityClass);
+            RestFilterParseResult filterParseResult;
+            try {
+                filterParseResult = restFilterParser.parse(filterJson, metadataClass);
+            } catch (RestFilterParseException e) {
+                throw new UnsupportedOperationException("Cannot parse entities filter" + e.getMessage(), e);
+            }
+
+            String jpqlWhere = filterParseResult.getJpqlWhere();
+            Map<String, Object> queryParameters = filterParseResult.getQueryParameters();
+
+            String queryString = "select e from " + metadataClass.getName() + " e";
+
+            if (jpqlWhere != null) {
+                queryString += " where " + jpqlWhere.replace("{E}", "e");
+            }
+            log.warn("queryString {}", queryString);
+
+            LoadContext.Query query = LoadContext.createQuery(queryString);
+            if (queryParameters != null) {
+                query.setParameters(queryParameters);
+            }
+
             if (StringUtils.isNotBlank(sortBy)) {
                 Sort sort = StringUtils.isNotBlank(sortOrder)
                         ? Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)

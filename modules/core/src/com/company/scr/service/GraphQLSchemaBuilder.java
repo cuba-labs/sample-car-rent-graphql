@@ -43,6 +43,9 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
 
         // enum type for order
         super.additionalType(GraphQLTypes.SortOrder);
+        // filter
+        super.additionalType(GraphQLTypes.Condition);
+        super.additionalType(GraphQLTypes.Filter);
 
         // build query and add to schema
         super.query(getQueryType(classes));
@@ -117,11 +120,12 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         classes.forEach(aClass -> {
             GraphQLType type = classCache.get(aClass);
 
-            // query 'cars(limit, offset, sortBy, sortOrder)'
+            // query 'cars(filter, limit, offset, sortBy, sortOrder)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(className(aClass) + "s")
                             .type(new GraphQLList(type))
+                            .argument(GraphQLArgument.newArgument().name(GraphQLConstants.FILTER).type(GraphQLTypes.Filter))
                             .argument(arg(GraphQLConstants.LIMIT, "Int"))
                             .argument(arg(GraphQLConstants.OFFSET, "Int"))
                             .argument(arg(GraphQLConstants.SORT_BY, "String"))
@@ -300,10 +304,10 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     /**
      * Shortcut for query argument builder
      * @param name argument name
-     * @param typeRef argument type reference
-     * @return
+     * @param typeRef argument type reference as string
+     * @return argument
      */
-    private GraphQLArgument.Builder arg(String name, String typeRef) {
+    private static GraphQLArgument.Builder arg(String name, String typeRef) {
         return GraphQLArgument.newArgument()
                 .name(name).type(GraphQLTypeReference.typeRef(typeRef));
     }
