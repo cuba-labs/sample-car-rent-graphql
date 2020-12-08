@@ -41,8 +41,6 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         super.additionalTypes(new HashSet<>(entityCache.values()));
         super.additionalTypes(new HashSet<>(inputClassCache.values()));
 
-        // enum type for order
-        super.additionalType(GraphQLTypes.SortOrder);
         // filter
         super.additionalType(GraphQLTypes.Condition);
         super.additionalType(GraphQLTypes.Filter);
@@ -128,9 +126,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                             .argument(GraphQLArgument.newArgument().name(GraphQLConstants.FILTER).type(GraphQLTypes.Filter))
                             .argument(arg(GraphQLConstants.LIMIT, "Int"))
                             .argument(arg(GraphQLConstants.OFFSET, "Int"))
-                            .argument(arg(GraphQLConstants.SORT_BY, "String"))
-                            .argument(GraphQLArgument.newArgument()
-                                    .name(GraphQLConstants.SORT_ORDER).type(GraphQLTypes.SortOrder))
+                            .argument(arg(GraphQLConstants.SORT, "String"))
                             .build());
 
             // query 'carById(id)'

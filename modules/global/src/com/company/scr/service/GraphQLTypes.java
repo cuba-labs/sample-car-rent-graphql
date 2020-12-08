@@ -4,9 +4,6 @@ import graphql.schema.*;
 
 public class GraphQLTypes {
 
-    public static GraphQLEnumType SortOrder = GraphQLEnumType.newEnum()
-            .name("SortOrder").value("ASC").value("DESC").build();
-
     public static GraphQLInputObjectType Condition = GraphQLInputObjectType.newInputObject()
             .name("Condition")
             .field(stringField("property"))

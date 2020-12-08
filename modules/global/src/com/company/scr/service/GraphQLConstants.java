@@ -4,7 +4,6 @@ public class GraphQLConstants {
 
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
-    public static final String SORT_BY = "sortBy";
-    public static final String SORT_ORDER = "sortOrder";
+    public static final String SORT = "sort";
     public static final String FILTER = "filter";
 }
