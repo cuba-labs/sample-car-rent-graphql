@@ -43,7 +43,8 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
 
         // filter
         super.additionalType(GraphQLTypes.Condition);
-        super.additionalType(GraphQLTypes.Filter);
+        super.additionalType(GraphQLTypes.GroupConditionType);
+        super.additionalType(GraphQLTypes.GroupCondition);
 
         // build query and add to schema
         super.query(getQueryType(classes));
@@ -123,7 +124,8 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(className(aClass) + "s")
                             .type(new GraphQLList(type))
-                            .argument(GraphQLArgument.newArgument().name(GraphQLConstants.FILTER).type(GraphQLTypes.Filter))
+                            .argument(GraphQLArgument.newArgument()
+                                    .name(GraphQLConstants.FILTER).type(GraphQLTypes.GroupCondition))
                             .argument(arg(GraphQLConstants.LIMIT, "Int"))
                             .argument(arg(GraphQLConstants.OFFSET, "Int"))
                             .argument(arg(GraphQLConstants.SORT, "String"))

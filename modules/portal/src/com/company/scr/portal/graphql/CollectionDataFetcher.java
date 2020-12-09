@@ -6,7 +6,6 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.haulmont.addon.restapi.api.service.filter.RestFilterParseException;
 import com.haulmont.addon.restapi.api.service.filter.RestFilterParseResult;
-import com.haulmont.addon.restapi.api.service.filter.RestFilterParser;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
@@ -32,7 +31,7 @@ public class CollectionDataFetcher {
     @Inject
     protected DataManager dataManager;
     @Inject
-    private RestFilterParser restFilterParser;
+    private GraphQLRestFilterParser restFilterParser;
     @Inject
     private Metadata metadata;
     @Inject

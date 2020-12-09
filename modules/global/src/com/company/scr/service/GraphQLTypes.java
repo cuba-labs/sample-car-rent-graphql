@@ -11,12 +11,24 @@ public class GraphQLTypes {
             .field(stringField("value"))
             .build();
 
-    public static GraphQLInputObjectType Filter = GraphQLInputObjectType.newInputObject()
-            .name("Filter")
-            .field(GraphQLInputObjectField.newInputObjectField()
-                    .name("conditions")
-                    .type(GraphQLList.list(Condition)))
+    public static GraphQLEnumType GroupConditionType = GraphQLEnumType.newEnum()
+            .name("GroupConditionType").value("AND").value("OR").build();
+
+    public static GraphQLInputObjectType GroupCondition = GraphQLInputObjectType.newInputObject()
+            .name("GroupCondition")
+            .field(field("conditions", GraphQLList.list(Condition)))
+            .field(field("group", GroupConditionType))
             .build();
+
+    /**
+     * Shortcut for type field builder
+     *
+     * @param fieldName field name
+     * @return field
+     */
+    public static GraphQLInputObjectField.Builder field(String fieldName, GraphQLInputType type) {
+        return GraphQLInputObjectField.newInputObjectField().name(fieldName).type(type);
+    }
 
     /**
      * Shortcut for type string field builder
@@ -25,6 +37,7 @@ public class GraphQLTypes {
      * @return field
      */
     public static GraphQLInputObjectField.Builder stringField(String fieldName) {
-        return GraphQLInputObjectField.newInputObjectField().name(fieldName).type(GraphQLTypeReference.typeRef("String"));
+        return field(fieldName, GraphQLTypeReference.typeRef("String"));
     }
+
 }
