@@ -17,6 +17,7 @@ public class GraphQLTypes {
     public static GraphQLInputObjectType GroupCondition = GraphQLInputObjectType.newInputObject()
             .name("GroupCondition")
             .field(field("conditions", GraphQLList.list(Condition)))
+            .field(field("groupConditions", GraphQLList.list(GraphQLTypeReference.typeRef("GroupCondition"))))
             .field(field("group", GroupConditionType))
             .build();
 

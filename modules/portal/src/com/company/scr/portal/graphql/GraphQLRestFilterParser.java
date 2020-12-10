@@ -29,6 +29,7 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.QueryUtils;
 import com.haulmont.cuba.core.global.filter.ParametersHelper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,10 +89,9 @@ public class GraphQLRestFilterParser {
 
         RestFilterGroupCondition rootCondition = new RestFilterGroupCondition();
         JsonObject filterObject = new JsonParser().parse(filterJson).getAsJsonObject();
-        JsonElement conditions = filterObject.get("conditions");
 
+        JsonArray mergedConditions = mergeConditionsAndGroups(filterObject);
         RestFilterGroupCondition.Type type = RestFilterGroupCondition.Type.AND;
-
         JsonElement group = filterObject.get("group");
         if (group != null) {
             try {
@@ -102,19 +102,16 @@ public class GraphQLRestFilterParser {
         }
         rootCondition.setType(type);
 
-        if (conditions != null && conditions.isJsonArray()) {
-            JsonArray conditionsJsonArray = conditions.getAsJsonArray();
-            if (conditionsJsonArray.size() != 0) {
-                for (JsonElement conditionElement : conditionsJsonArray) {
-                    JsonObject conditionObject = conditionElement.getAsJsonObject();
-                    RestFilterCondition restFilterCondition = parseConditionObject(conditionObject, metaClass);
-                    rootCondition.getConditions().add(restFilterCondition);
-                }
-                Map<String, Object> queryParameters = new HashMap<>();
-                collectQueryParameters(rootCondition, queryParameters);
-
-                return new RestFilterParseResult(rootCondition.toJpql(), queryParameters);
+        if (mergedConditions.size() != 0) {
+            for (JsonElement conditionElement : mergedConditions) {
+                JsonObject conditionObject = conditionElement.getAsJsonObject();
+                RestFilterCondition restFilterCondition = parseConditionObject(conditionObject, metaClass);
+                rootCondition.getConditions().add(restFilterCondition);
             }
+            Map<String, Object> queryParameters = new HashMap<>();
+            collectQueryParameters(rootCondition, queryParameters);
+
+            return new RestFilterParseResult(rootCondition.toJpql(), queryParameters);
         }
 
         return new RestFilterParseResult(null, null);
@@ -155,14 +152,13 @@ public class GraphQLRestFilterParser {
         RestFilterGroupCondition groupCondition = new RestFilterGroupCondition();
         groupCondition.setType(type);
 
-        JsonElement conditions = conditionJsonObject.get("conditions");
-        if (conditions != null) {
+        JsonArray conditions = mergeConditionsAndGroups(conditionJsonObject);
+        if (conditions.size() > 0) {
             for (JsonElement conditionElement : conditions.getAsJsonArray()) {
                 RestFilterCondition childCondition = parseConditionObject(conditionElement.getAsJsonObject(), metaClass);
                 groupCondition.getConditions().add(childCondition);
             }
         }
-
         return groupCondition;
     }
 
@@ -302,4 +298,20 @@ public class GraphQLRestFilterParser {
     protected String generateQueryParamName() {
         return RandomStringUtils.randomAlphabetic(10);
     }
+
+    @NotNull
+    private JsonArray mergeConditionsAndGroups(JsonObject filterObject) {
+        JsonArray mergedConditions = new JsonArray();
+        JsonElement conditions = filterObject.get("conditions");
+        JsonElement groupConditions = filterObject.get("groupConditions");
+
+        if (conditions != null && conditions.isJsonArray()) {
+            mergedConditions.addAll(conditions.getAsJsonArray());
+        }
+        if (groupConditions != null && groupConditions.isJsonArray()) {
+            mergedConditions.addAll(groupConditions.getAsJsonArray());
+        }
+        return mergedConditions;
+    }
+
 }
