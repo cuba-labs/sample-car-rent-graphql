@@ -1,14 +1,21 @@
 package com.company.scr.service;
 
+import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.entity.Entity;
 import graphql.Scalars;
 import graphql.schema.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.*;
-import java.lang.reflect.Field;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,13 +39,21 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     public GraphQLSchemaBuilder(EntityManager entityManager, List<Class<? extends Entity>> classes) {
         populateStandardAttributeMappers();
 
-        // put jpa model to entityCache
+        // enums
+        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+        provider.addIncludeFilter(new AssignableTypeFilter(EnumClass.class));
+        // todo now we search enums only in 'company' package
+        provider.findCandidateComponents(ENUM_CLASS_BASE_PACKAGE)
+                .forEach(this::buildEnumType);
+        super.additionalTypes(new HashSet<>(enumsCache.values()));
+
+        // jpa model
         entityManager.getMetamodel().getEntities().stream()
                 .filter(this::isNotIgnored)
                 .forEach(this::buildObjectType);
-
-        // add types to schema
         super.additionalTypes(new HashSet<>(entityCache.values()));
+
+        // add input types to schema
         super.additionalTypes(new HashSet<>(inputClassCache.values()));
 
         // filter
@@ -47,10 +62,10 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         super.additionalType(GraphQLTypes.GroupCondition);
 
         // build query and add to schema
-        super.query(getQueryType(classes));
+        super.query(buildQuerySection(classes));
 
         // build mutation and add to schema
-        super.mutation(getMutationType(classes));
+        super.mutation(buildMutationSection(classes));
     }
 
     /**
@@ -63,7 +78,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLVoid));
     }
 
-    private AttributeMapper createStandardAttributeMapper(final Class<?> assignableClass, final GraphQLType type) {
+    private AttributeMapper createStandardAttributeMapper(final Class<?> assignableClass, final GraphQLInputType type) {
         return (javaType) -> {
             if (assignableClass.isAssignableFrom(javaType))
                 return Optional.of(type);
@@ -71,7 +86,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         };
     }
 
-    GraphQLObjectType getMutationType(List<Class<? extends Entity>> classes) {
+    GraphQLObjectType buildMutationSection(List<Class<? extends Entity>> classes) {
         GraphQLObjectType.Builder qtBuilder = GraphQLObjectType.newObject().name("Mutation");
         List<GraphQLFieldDefinition> fields = new ArrayList<>();
 
@@ -110,7 +125,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         return qtBuilder.build();
     }
 
-    GraphQLObjectType getQueryType(List<Class<? extends Entity>> classes) {
+    GraphQLObjectType buildQuerySection(List<Class<? extends Entity>> classes) {
         GraphQLObjectType.Builder queryType = GraphQLObjectType.newObject().name("Query")
                 .description("All encompassing schema for this JPA environment");
 
@@ -152,10 +167,34 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         return queryType.build();
     }
 
-    void buildObjectType(EntityType<?> entityType) {
-        if (entityCache.containsKey(entityType))
-            return;
+    private void buildEnumType(BeanDefinition beanDefinition)  {
+        String enumClassName = beanDefinition.getBeanClassName();
+        String enumName = StringUtils.substringAfterLast(enumClassName, ".");
+        try {
+            Class<?> enumClass = Class.forName(enumClassName);
+            EnumClass[] enumValues = (EnumClass[]) enumClass.getDeclaredMethod("values").invoke(null);
+            log.warn("buildEnumType: values {}", enumClassName, Arrays.toString(enumValues));
 
+            List<GraphQLEnumValueDefinition> enumValueDefs = Arrays.stream(enumValues).map(eV -> {
+                Object id = eV.getId();
+                String name = ((Enum) eV).name();
+                return GraphQLEnumValueDefinition.newEnumValueDefinition().name(name).value(id).build();
+            }).collect(Collectors.toList());
+
+            GraphQLEnumType enumType = GraphQLEnumType.newEnum()
+                    .name(enumName)
+                    .values(enumValueDefs)
+                    .build();
+
+            enumsCache.put(enumClass, enumType);
+
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        throw new UnsupportedOperationException(
+                "Enum type build failed - can't find enum class " + enumClassName);
+        }
+    }
+
+    void buildObjectType(EntityType<?> entityType) {
         GraphQLObjectType outAnswer = GraphQLObjectType.newObject()
                 .name(entityType.getName().replaceAll("\\$", "_"))
                 .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField)
@@ -186,10 +225,23 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
 //    }
 
     private Stream<GraphQLType> getAttributeType(Attribute attribute) {
+        Class attrJavaType = attribute.getDeclaringType().getJavaType();
         if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC) {
             try {
+                // enums - we need to check getters and setters, but not field types
+                PropertyDescriptor pd = new PropertyDescriptor(attribute.getName(), attrJavaType);
+                Class<?> propertyType = pd.getPropertyType();
+                // todo now we are working with enums located in 'company' package only
+                if (EnumClass.class.isAssignableFrom(propertyType)
+                        && attrJavaType.getCanonicalName().contains(ENUM_CLASS_BASE_PACKAGE)) {
+                    return Stream.of(getEnumAttributeType(propertyType));
+                }
+
+                // other simple types
                 return Stream.of(getBasicAttributeType(attribute.getJavaType()));
-            } catch (UnsupportedOperationException e) {
+
+            // todo refactor, do not swallow exception
+            } catch (UnsupportedOperationException | IntrospectionException e) {
                 //fall through to the exception below
                 //which is more useful because it also contains the declaring member
             }
@@ -203,14 +255,14 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             return Stream.of(typeReference);
         } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.ELEMENT_COLLECTION) {
             Type foreignType = ((PluralAttribute) attribute).getElementType();
-            return Stream.of(new GraphQLList(getTypeFromJavaType(foreignType.getJavaType())));
+            return Stream.of(new GraphQLList(getBasicAttributeType(foreignType.getJavaType())));
         } else if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED) {
             EmbeddableType<?> embeddableType = (EmbeddableType<?>) ((SingularAttribute<?, ?>) attribute).getType();
             return Stream.of(new GraphQLTypeReference(embeddableType.getJavaType().getSimpleName()));
         }
 
 //        // todo temporary map all unsupported to String
-        Class classType = attribute.getDeclaringType().getJavaType();
+        Class classType = attrJavaType;
         Class attrType = attribute.getJavaType();
         log.warn("attribute {} from class {} has unsupported type {}, temporary map to String", attribute.getName(), classType, attrType);
         return Stream.of(new GraphQLTypeReference("String"));
@@ -243,49 +295,12 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             return Scalars.GraphQLLong;
         else if (Boolean.class.isAssignableFrom(javaType) || boolean.class.isAssignableFrom(javaType))
             return Scalars.GraphQLBoolean;
-        else if (javaType.isEnum()) {
-            return getTypeFromJavaType(javaType);
-        } else if (BigDecimal.class.isAssignableFrom(javaType)) {
+        else if (BigDecimal.class.isAssignableFrom(javaType)) {
             return Scalars.GraphQLBigDecimal;
         }
 
         throw new UnsupportedOperationException(
                 "Class could not be mapped to GraphQL: '" + javaType.getClass().getTypeName() + "'");
-    }
-
-    protected GraphQLType getTypeFromJavaType(Class clazz) {
-        if (clazz.isEnum()) {
-            if (classCache.containsKey(clazz))
-                return classCache.get(clazz);
-
-            GraphQLEnumType.Builder enumBuilder = GraphQLEnumType.newEnum().name(clazz.getSimpleName());
-            int ordinal = 0;
-            for (Enum enumValue : ((Class<Enum>) clazz).getEnumConstants())
-                enumBuilder.value(enumValue.name(), ordinal++);
-
-            GraphQLType answer = enumBuilder.build();
-            setIdentityCoercing(answer);
-
-            classCache.put(clazz, answer);
-            return answer;
-        }
-
-        return getBasicAttributeType(clazz);
-    }
-
-    /**
-     * A bit of a hack, since JPA will deserialize our Enum's for us...we don't want GraphQL doing it.
-     *
-     * @param type
-     */
-    private void setIdentityCoercing(GraphQLType type) {
-        try {
-            Field coercing = type.getClass().getDeclaredField("coercing");
-            coercing.setAccessible(true);
-            coercing.set(type, new IdentityCoercing());
-        } catch (Exception e) {
-            log.error("Unable to set coercing for " + type, e);
-        }
     }
 
     private boolean isNotIgnored(EntityType entityType) {

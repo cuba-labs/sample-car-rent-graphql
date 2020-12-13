@@ -1,5 +1,6 @@
 package com.company.scr.service;
 
+import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.Folder;
 import com.haulmont.cuba.core.entity.ReferenceToEntity;
@@ -13,6 +14,8 @@ import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
@@ -23,11 +26,14 @@ import java.util.stream.Stream;
 
 public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
 
+    protected static final String ENUM_CLASS_BASE_PACKAGE = "com.company.scr.entity";
+
     private static final String TYPE_REF_STRING = "String";
     private static final String CLIENT_ID_NAME = "clientId";
     private final Logger log = LoggerFactory.getLogger(GraphQLInputTypesBuilder.class);
 
     protected final List<AttributeMapper> attributeMappers = new ArrayList<>();
+    protected final Map<Class, GraphQLEnumType> enumsCache = new HashMap<>();
 
 
     protected GraphQLInputObjectType buildInputType(EntityType<?> entityType) {
@@ -75,10 +81,22 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
 
     private Stream<GraphQLInputType> getAttributeType(Attribute metaAttr) {
         Attribute.PersistentAttributeType persistentType = metaAttr.getPersistentAttributeType();
+        Class attrJavaType = metaAttr.getDeclaringType().getJavaType();
+
         if (persistentType == Attribute.PersistentAttributeType.BASIC) {
             try {
+                // enums - we need to check getters and setters, but not field types
+                PropertyDescriptor pd = new PropertyDescriptor(metaAttr.getName(), attrJavaType);
+                Class<?> propertyType = pd.getPropertyType();
+                // todo now we are working with enums located in 'company' package only
+                if (EnumClass.class.isAssignableFrom(propertyType)
+                        && attrJavaType.getCanonicalName().contains(ENUM_CLASS_BASE_PACKAGE)) {
+                    return Stream.of((GraphQLInputType) getEnumAttributeType(propertyType));
+                }
+
                 return Stream.of(getBasicAttributeType(metaAttr.getJavaType()));
-            } catch (UnsupportedOperationException e) {
+            // todo do not swallow
+            } catch (UnsupportedOperationException | IntrospectionException e) {
                 //fall through to the exception below
                 //which is more useful because it also contains the declaring member
             }
@@ -142,6 +160,12 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
 
         throw new UnsupportedOperationException(
                 "Class could not be mapped to GraphQL: '" + javaType.getClass().getTypeName() + "'");
+    }
+
+    protected GraphQLType getEnumAttributeType(Class javaType) {
+        GraphQLEnumType enumType = enumsCache.get(javaType);
+        if (enumType == null) throw new IllegalArgumentException("No GraphQL enum type provided for " + javaType);
+        return enumType;
     }
 
     protected static String convertType(String name) {
