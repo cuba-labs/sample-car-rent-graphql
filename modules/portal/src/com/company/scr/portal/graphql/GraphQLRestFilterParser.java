@@ -16,10 +16,7 @@ package com.company.scr.portal.graphql;
  */
 
 import com.google.common.base.Strings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.haulmont.addon.restapi.api.service.filter.*;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
@@ -212,8 +209,14 @@ public class GraphQLRestFilterParser {
         }
 
         if (isValueRequired) {
-            Object value = null;
+            Object value;
             if (op == RestFilterOp.IN || op == RestFilterOp.NOT_IN) {
+
+                // try to find array in input string - due to graphql specific we send array inside string
+                if (!valueJsonElem.isJsonArray()) {
+                    valueJsonElem = JsonParser.parseString(valueJsonElem.getAsString());
+                }
+
                 if (!valueJsonElem.isJsonArray()) {
                     throw new RestFilterParseException("JSON array was expected as a value for condition with operator " + operator);
                 }
