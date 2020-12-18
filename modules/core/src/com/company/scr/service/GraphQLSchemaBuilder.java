@@ -1,5 +1,8 @@
 package com.company.scr.service;
 
+import com.company.scr.graphql.GraphQLConstants;
+import com.company.scr.graphql.GraphQLTypes;
+import com.company.scr.graphql.JavaScalars;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.entity.Entity;
 import graphql.Scalars;
@@ -73,6 +76,8 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
      */
     private void populateStandardAttributeMappers() {
         attributeMappers.add(createStandardAttributeMapper(UUID.class, JavaScalars.GraphQLUUID));
+        attributeMappers.add(createStandardAttributeMapper(Long.class, JavaScalars.GraphQLLong));
+        attributeMappers.add(createStandardAttributeMapper(BigDecimal.class, JavaScalars.GraphQLBigDecimal));
         attributeMappers.add(createStandardAttributeMapper(Date.class, JavaScalars.GraphQLDate));
         attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLLocalDateTime));
         attributeMappers.add(createStandardAttributeMapper(LocalDateTime.class, JavaScalars.GraphQLVoid));
@@ -158,7 +163,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("count" + aClass.getSimpleName() + "s")
-                            .type(Scalars.GraphQLLong)
+                            .type(JavaScalars.GraphQLLong)
                             .build());
 
         });
@@ -291,12 +296,8 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         else if (Float.class.isAssignableFrom(javaType) || float.class.isAssignableFrom(javaType)
                 || Double.class.isAssignableFrom(javaType) || double.class.isAssignableFrom(javaType))
             return Scalars.GraphQLFloat;
-        else if (Long.class.isAssignableFrom(javaType) || long.class.isAssignableFrom(javaType))
-            return Scalars.GraphQLLong;
-        else if (Boolean.class.isAssignableFrom(javaType) || boolean.class.isAssignableFrom(javaType))
+        else if (Boolean.class.isAssignableFrom(javaType) || boolean.class.isAssignableFrom(javaType)) {
             return Scalars.GraphQLBoolean;
-        else if (BigDecimal.class.isAssignableFrom(javaType)) {
-            return Scalars.GraphQLBigDecimal;
         }
 
         throw new UnsupportedOperationException(

@@ -1,6 +1,6 @@
 package com.company.scr.portal.graphql;
 
-import com.company.scr.service.GraphQLConstants;
+import com.company.scr.graphql.GraphQLConstants;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;

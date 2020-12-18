@@ -19,7 +19,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -146,16 +145,11 @@ public abstract class GraphQLInputTypesBuilder extends GraphQLSchema.Builder {
         else if (Float.class.isAssignableFrom(javaType) || float.class.isAssignableFrom(javaType)
                 || Double.class.isAssignableFrom(javaType) || double.class.isAssignableFrom(javaType))
             return Scalars.GraphQLFloat;
-        else if (Long.class.isAssignableFrom(javaType) || long.class.isAssignableFrom(javaType))
-            return Scalars.GraphQLLong;
         else if (Boolean.class.isAssignableFrom(javaType) || boolean.class.isAssignableFrom(javaType))
             return Scalars.GraphQLBoolean;
-        else if (javaType.isEnum())
+        else if (javaType.isEnum()) {
             // todo map enums to String for now
             return Scalars.GraphQLString;
-//            return getTypeFromJavaType(javaType);
-        else if (BigDecimal.class.isAssignableFrom(javaType)) {
-            return Scalars.GraphQLBigDecimal;
         }
 
         throw new UnsupportedOperationException(

@@ -1,4 +1,4 @@
-package com.company.scr.service;
+package com.company.scr.graphql;
 
 import graphql.schema.*;
 

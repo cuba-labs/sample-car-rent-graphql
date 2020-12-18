@@ -6,12 +6,11 @@ import com.company.scr.entity.test.CompositionO2OTestEntity;
 import com.company.scr.entity.test.DatatypesTestEntity;
 import com.company.scr.entity.test.DatatypesTestEntity2;
 import com.company.scr.entity.test.DatatypesTestEntity3;
+import com.company.scr.graphql.JavaScalars;
 import com.company.scr.service.GraphQLService;
-import com.company.scr.service.JavaScalars;
 import com.haulmont.cuba.security.entity.User;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.Scalars;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.slf4j.Logger;
@@ -53,11 +52,11 @@ public class GraphQLPortalService {
 
         RuntimeWiring.Builder rwBuilder = RuntimeWiring.newRuntimeWiring();
         rwBuilder.scalar(JavaScalars.GraphQLUUID)
+                .scalar(JavaScalars.GraphQLLong)
+                .scalar(JavaScalars.GraphQLBigDecimal)
                 .scalar(JavaScalars.GraphQLDate)
                 .scalar(JavaScalars.GraphQLLocalDateTime)
-                .scalar(JavaScalars.GraphQLVoid)
-                .scalar(Scalars.GraphQLLong)
-                .scalar(Scalars.GraphQLBigDecimal);
+                .scalar(JavaScalars.GraphQLVoid);
         GraphQLSchemaUtils.assignDataFetchers(rwBuilder, collectionDataFetcher, entityDataFetcher, entityMutationResolver, classes);
 
         graphQLSchema = new SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, rwBuilder.build());

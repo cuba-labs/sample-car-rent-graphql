@@ -1,4 +1,4 @@
-package com.company.scr.service;
+package com.company.scr.graphql;
 
 import graphql.language.StringValue;
 import graphql.schema.Coercing;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-import static com.company.scr.service.JavaScalars.CUBA_SERIALIZATION_DATE_FORMAT;
+import static com.company.scr.graphql.JavaScalars.CUBA_SERIALIZATION_DATE_FORMAT;
 
 public class DateScalar extends GraphQLScalarType{
 
