@@ -53,11 +53,11 @@ public class CollectionDataFetcher {
             String queryString = "select e from " + metaClass.getName() + " e";
 
             Map<String, Object> queryParameters = null;
-            // todo implement graphql type mapper that leave filter as plain string (not convert to Map) or returns RestFilterParseResult
             Object filterArg = environment.getArgument(GraphQLConstants.FILTER);
             if (filterArg != null) {
                 RestFilterParseResult filterParseResult;
                 try {
+                    // todo converting to JSON not need here - rewrite parser to work with Map
                     filterParseResult = restFilterParser.parse(new Gson().toJson(filterArg), metaClass);
                 } catch (RestFilterParseException e) {
                     throw new UnsupportedOperationException("Cannot parse entities filter" + e.getMessage(), e);
