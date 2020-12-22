@@ -21,6 +21,8 @@ public class DataFetcherUtils {
 
         List<String> properties = definitions.keySet().stream()
                 .map(def -> def.replaceAll("/", "."))
+                // remove '__typename' from fetch plan
+                .filter(prop -> !prop.equals("__typename"))
                 .collect(Collectors.toList());
 
         log.warn("properties {}", properties);
