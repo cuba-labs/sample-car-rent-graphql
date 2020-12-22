@@ -43,6 +43,8 @@ public class PortalController {
         return "graphiql";
     }
 
+    // todo configure CORS
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/graphql")
     public ResponseEntity<Object> graphql(@RequestBody Map<String, String> requestBody) {
         String query = requestBody.get("query");
