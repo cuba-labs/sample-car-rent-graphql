@@ -35,31 +35,45 @@ directive @specifiedBy(
 ) on SCALAR
 
 type Mutation {
-    createCar(car: inp_scr_Car): scr_Car
-    createCompositionO2OTestEntity(compositiono2otestentity: inp_scr_CompositionO2OTestEntity): scr_CompositionO2OTestEntity
-    createDatatypesTestEntity(datatypestestentity: inp_scr_DatatypesTestEntity): scr_DatatypesTestEntity
-    createDatatypesTestEntity2(datatypestestentity2: inp_scr_DatatypesTestEntity2): scr_DatatypesTestEntity2
-    createDatatypesTestEntity3(datatypestestentity3: inp_scr_DatatypesTestEntity3): scr_DatatypesTestEntity3
-    createGarage(garage: inp_scr_Garage): scr_Garage
-    createUser(user: inp_sec_User): sec_User
+    createCar(car: inp_scr_Car!): scr_Car
+    createCompositionO2OTestEntity(compositionO2OTestEntity: inp_scr_CompositionO2OTestEntity!): scr_CompositionO2OTestEntity
+    createDatatypesTestEntity(datatypesTestEntity: inp_scr_DatatypesTestEntity!): scr_DatatypesTestEntity
+    createDatatypesTestEntity2(datatypesTestEntity2: inp_scr_DatatypesTestEntity2!): scr_DatatypesTestEntity2
+    createDatatypesTestEntity3(datatypesTestEntity3: inp_scr_DatatypesTestEntity3!): scr_DatatypesTestEntity3
+    createGarage(garage: inp_scr_Garage!): scr_Garage
+    createUser(user: inp_sec_User!): sec_User
+    deleteCar(id: UUID!): Void
+    deleteCompositionO2OTestEntity(id: UUID!): Void
+    deleteDatatypesTestEntity(id: UUID!): Void
+    deleteDatatypesTestEntity2(id: UUID!): Void
+    deleteDatatypesTestEntity3(id: UUID!): Void
+    deleteGarage(id: UUID!): Void
+    deleteUser(id: UUID!): Void
 }
 
 "All encompassing schema for this JPA environment"
 type Query {
     carById(id: String): scr_Car
-    cars: [scr_Car]
-    compositiono2otestentityById(id: String): scr_CompositionO2OTestEntity
-    compositiono2otestentitys: [scr_CompositionO2OTestEntity]
-    datatypestestentity2ById(id: String): scr_DatatypesTestEntity2
-    datatypestestentity2s: [scr_DatatypesTestEntity2]
-    datatypestestentity3ById(id: String): scr_DatatypesTestEntity3
-    datatypestestentity3s: [scr_DatatypesTestEntity3]
-    datatypestestentityById(id: String): scr_DatatypesTestEntity
-    datatypestestentitys: [scr_DatatypesTestEntity]
+    carCount: Long
+    carList(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_Car]
+    compositionO2OTestEntityById(id: String): scr_CompositionO2OTestEntity
+    compositionO2OTestEntityCount: Long
+    compositionO2OTestEntityList(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_CompositionO2OTestEntity]
+    datatypesTestEntity2ById(id: String): scr_DatatypesTestEntity2
+    datatypesTestEntity2Count: Long
+    datatypesTestEntity2List(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_DatatypesTestEntity2]
+    datatypesTestEntity3ById(id: String): scr_DatatypesTestEntity3
+    datatypesTestEntity3Count: Long
+    datatypesTestEntity3List(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_DatatypesTestEntity3]
+    datatypesTestEntityById(id: String): scr_DatatypesTestEntity
+    datatypesTestEntityCount: Long
+    datatypesTestEntityList(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_DatatypesTestEntity]
     garageById(id: String): scr_Garage
-    garages: [scr_Garage]
+    garageCount: Long
+    garageList(filter: GroupCondition, limit: Int, offset: Int, sort: String): [scr_Garage]
     userById(id: String): scr_User
-    users: [sec_User]
+    userCount: Long
+    userList(filter: GroupCondition, limit: Int, offset: Int, sort: String): [sec_User]
 }
 
 type datagen_GeneratedEntity {
@@ -100,8 +114,8 @@ type scr_BoringStringIdTestEntity {
 }
 
 type scr_Car {
-    carType: String
-    ecoRank: Int
+    carType: CarType
+    ecoRank: EcoRank
     garage: scr_Garage
     id: UUID
     manufactureDate: Date
@@ -152,12 +166,12 @@ type scr_DatatypesTestEntity {
     dateAttr: Date
     dateTimeAttr: Date
     doubleAttr: Float
-    enumAttr: String
+    enumAttr: TestEnum
     id: UUID
     intIdentityIdTestEntityAssociationO2OAttr: scr_IntIdentityIdTestEntity
     integerAttr: Int
     integerIdTestEntityAssociationM2MAttr: [scr_IntegerIdTestEntity]
-    localDateAttr: LocalDate
+    localDateAttr: String
     localDateTimeAttr: LocalDateTime
     localTimeAttr: String
     longAttr: Long
@@ -493,23 +507,53 @@ type sec_UserSubstitution {
     user: scr_User
 }
 
-"Built-in java.math.BigDecimal"
+enum CarType {
+    HATCHBACK
+    SEDAN
+}
+
+enum EcoRank {
+    EURO1
+    EURO2
+    EURO3
+}
+
+enum GroupConditionType {
+    AND
+    OR
+}
+
+enum TestEnum {
+    NEW_VALUE
+    NEW_VALUE1
+    NEW_VALUE2
+}
+
 scalar BigDecimal
 
 "Date type"
 scalar Date
 
 "Date type"
-scalar LocalDate
-
-"Date type"
 scalar LocalDateTime
 
-"Long type"
 scalar Long
 
-"UUID type"
 scalar UUID
+
+scalar Void
+
+input Condition {
+    operator: String
+    property: String
+    value: String
+}
+
+input GroupCondition {
+    conditions: [Condition]
+    group: GroupConditionType
+    groupConditions: [GroupCondition]
+}
 
 input inp_datagen_GeneratedEntity {
     clientId: String
@@ -550,18 +594,18 @@ input inp_scr_AssociationO2OTestEntity {
 input inp_scr_BoringStringIdTestEntity {
     clientId: String
     description: String
-    id: String
+    id: String!
     uuid: UUID
 }
 
 input inp_scr_Car {
-    carType: String
+    carType: CarType!
     clientId: String
-    ecoRank: Int
+    ecoRank: EcoRank
     garage: inp_scr_Garage
     id: UUID
     manufactureDate: Date
-    manufacturer: String
+    manufacturer: String!
     maxPassengers: Int
     mileage: Float
     model: String
@@ -612,12 +656,12 @@ input inp_scr_DatatypesTestEntity {
     dateAttr: Date
     dateTimeAttr: Date
     doubleAttr: Float
-    enumAttr: String
+    enumAttr: TestEnum
     id: UUID
     intIdentityIdTestEntityAssociationO2OAttr: inp_scr_IntIdentityIdTestEntity
     integerAttr: Int
     integerIdTestEntityAssociationM2MAttr: [inp_scr_IntegerIdTestEntity]
-    localDateAttr: LocalDate
+    localDateAttr: String
     localDateTimeAttr: LocalDateTime
     localTimeAttr: String
     longAttr: Long
@@ -674,7 +718,7 @@ input inp_scr_Garage {
     cars: [inp_scr_Car]
     clientId: String
     id: UUID
-    name: String
+    name: String!
     personnel: [inp_scr_User]
     vanEntry: Boolean
     workingHoursFrom: String
@@ -709,7 +753,7 @@ input inp_scr_StringIdTestEntity {
     datatypesTestEntity: inp_scr_DatatypesTestEntity
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
-    identifier: String
+    identifier: String!
     productCode: String
 }
 
@@ -732,8 +776,8 @@ input inp_scr_User {
     ipMask: String
     language: String
     lastName: String
-    login: String
-    loginLowerCase: String
+    login: String!
+    loginLowerCase: String!
     middleName: String
     name: String
     password: String
@@ -752,21 +796,21 @@ input inp_scr_WeirdStringIdTestEntity {
     datatypesTestEntity3: inp_scr_DatatypesTestEntity3
     description: String
     id: String
-    identifier: String
+    identifier: String!
 }
 
 input inp_sec_Constraint {
-    checkType: String
+    checkType: String!
     clientId: String
     code: String
-    entityName: String
+    entityName: String!
     filterXml: String
     groovyScript: String
     group: inp_sec_Group
     id: UUID
     isActive: Boolean
     joinClause: String
-    operationType: String
+    operationType: String!
     sysTenantId: String
     whereClause: String
 }
@@ -800,7 +844,7 @@ input inp_sec_Group {
     constraints: [inp_sec_Constraint]
     hierarchyList: [inp_sec_GroupHierarchy]
     id: UUID
-    name: String
+    name: String!
     parent: inp_sec_Group
     sessionAttributes: [inp_sec_SessionAttribute]
     sysTenantId: String
@@ -817,9 +861,9 @@ input inp_sec_GroupHierarchy {
 
 input inp_sec_LocalizedConstraintMessage {
     clientId: String
-    entityName: String
+    entityName: String!
     id: UUID
-    operationType: String
+    operationType: String!
     values: String
 }
 
@@ -862,7 +906,7 @@ input inp_sec_Presentation {
 input inp_sec_RememberMeToken {
     clientId: String
     id: UUID
-    token: String
+    token: String!
     user: inp_scr_User
 }
 
@@ -872,7 +916,7 @@ input inp_sec_Role {
     description: String
     id: UUID
     locName: String
-    name: String
+    name: String!
     permissions: [inp_sec_Permission]
     securityScope: String
     sysTenantId: String
@@ -922,9 +966,9 @@ input inp_sec_SessionLogEntry {
     clientType: String
     finishedTs: Date
     id: UUID
-    lastAction: Int
+    lastAction: Int!
     server: String
-    sessionId: UUID
+    sessionId: UUID!
     startedTs: Date
     substitutedUser: inp_scr_User
     sysTenantId: String
@@ -944,8 +988,8 @@ input inp_sec_User {
     ipMask: String
     language: String
     lastName: String
-    login: String
-    loginLowerCase: String
+    login: String!
+    loginLowerCase: String!
     middleName: String
     name: String
     password: String

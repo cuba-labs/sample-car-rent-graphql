@@ -1,5 +1,6 @@
 package com.company.scr.portal.graphql;
 
+import com.company.scr.graphql.GraphQLNamingUtils;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.importexport.EntityImportExportService;
 import com.haulmont.cuba.core.app.importexport.EntityImportView;
@@ -36,7 +37,7 @@ public class EntityMutationResolver {
     public DataFetcher<Entity> createEntity(Class<Entity> entityClass) {
         return environment -> {
 
-            Map<String, String> input = environment.getArgument(entityClass.getSimpleName().toLowerCase());
+            Map<String, String> input = environment.getArgument(GraphQLNamingUtils.uncapitalizedSimpleName(entityClass));
             log.warn("createEntity: input {}", input);
 
             String entityJson = new JSONObject(input).toString();

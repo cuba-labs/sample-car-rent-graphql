@@ -1,6 +1,7 @@
 package com.company.scr.service;
 
 import com.company.scr.graphql.GraphQLConstants;
+import com.company.scr.graphql.GraphQLNamingUtils;
 import com.company.scr.graphql.GraphQLTypes;
 import com.company.scr.graphql.JavaScalars;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
@@ -100,7 +101,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             GraphQLOutputType outType = (GraphQLOutputType) classCache.get(aClass);
 
             GraphQLArgument createEntityArgument = GraphQLArgument.newArgument()
-                    .name(className(aClass))
+                    .name(GraphQLNamingUtils.uncapitalizedSimpleName(aClass))
                     .type(GraphQLNonNull.nonNull(inputType))
                     .build();
 
@@ -142,7 +143,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             // query 'cars(filter, limit, offset, sortBy, sortOrder)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
-                            .name(className(aClass) + "s")
+                            .name(GraphQLNamingUtils.composeListQueryName(aClass))
                             .type(new GraphQLList(type))
                             .argument(GraphQLArgument.newArgument()
                                     .name(GraphQLConstants.FILTER).type(GraphQLTypes.GroupCondition))
@@ -154,7 +155,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             // query 'carById(id)'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
-                            .name(className(aClass) + "ById")
+                            .name(GraphQLNamingUtils.composeByIdQueryName(aClass))
                             .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
                             .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
                             .build());
@@ -162,7 +163,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             // query 'countCars()'
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
-                            .name("count" + aClass.getSimpleName() + "s")
+                            .name(GraphQLNamingUtils.composeCountQueryName(aClass))
                             .type(JavaScalars.GraphQLLong)
                             .build());
 
@@ -309,10 +310,6 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             return false;
         }
         return true;
-    }
-
-    private static String className(Class aClass) {
-        return aClass.getSimpleName().toLowerCase();
     }
 
     /**
