@@ -2,7 +2,7 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import { IReactionDisposer, reaction } from "mobx";
-import { Modal, Button, Card, Icon, message } from "antd";
+import {Modal, Button, Card, Icon, message, Input} from "antd";
 import {
   injectMainStore,
   MainStoreInjected
@@ -14,7 +14,7 @@ import {
   Spinner
 } from "@cuba-platform/react-ui";
 import { Car } from "../../cuba/entities/scr$Car";
-import { SerializedEntity } from "@cuba-platform/rest";
+import {ConditionsGroup, SerializedEntity} from "@cuba-platform/rest";
 import { CarCrud } from "./CarCrud";
 import {
   FormattedMessage,
@@ -23,22 +23,40 @@ import {
 } from "react-intl";
 import { PaginationConfig } from "antd/es/pagination";
 import {ApolloClient, gql, InMemoryCache, useQuery} from '@apollo/client';
+import {GroupCondition} from '../../cuba/entities/base/sec$GroupCondition';
+import Search from 'antd/es/input/Search';
+import {useState} from 'react';
+
+const CAR_LIST = gql`
+    query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
+        carList(filter: $filter, limit: $limit, offset: $offset, sort: $sort) {
+            manufacturer
+            model
+        }
+    }
+`;
 
 const CarList = (props: {
     paginationConfig: PaginationConfig;
     onPagingChange: (current: number, pageSize: number) => void;
   }) => {
 
-  const {loading, error, data} = useQuery(
-    gql`
-      query CarList {
-          carList {
-              manufacturer
-              model
+  // const [filter, setFilter] = useState<ConditionsGroup>();
+
+  const {loading, error, data} = useQuery(CAR_LIST, {
+    variables: {
+      filter: {
+        group: 'AND',
+        conditions: [
+          {
+            property: 'manufacturer',
+            operator: '=',
+            value: 'Tata'
           }
+        ]
       }
-    `
-  );
+    }
+  });
 
   if (loading) {
     return <>Loading...</>;
@@ -48,7 +66,24 @@ const CarList = (props: {
     return <>Error :(</>;
   }
 
-  return <>{JSON.stringify(data)}</>;
+  return (
+    <>
+      {/*<Search placeholder='Filter by manufacturer'*/}
+      {/*        key='search'*/}
+      {/*        onSearch={val => setFilter({*/}
+      {/*          group: 'AND',*/}
+      {/*          conditions: [*/}
+      {/*            {*/}
+      {/*              property: 'manufacturer',*/}
+      {/*              operator: '=',*/}
+      {/*              value: val*/}
+      {/*            }*/}
+      {/*          ]*/}
+      {/*        })}*/}
+      {/*/>*/}
+      {data.carList.map((car: Partial<Car>, index: number) => <p key={index}>{JSON.stringify(car)}<br/></p>)}
+    </>
+  );
 };
 
 export default CarList;
