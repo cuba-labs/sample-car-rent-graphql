@@ -1,6 +1,6 @@
 {
-  "short_name": "sample-car-rent-graphql",
-  "name": "sample-car-rent-graphql",
+  "short_name": "sample-car-rent",
+  "name": "sample-car-rent",
   "icons": [
     {
       "src": "favicon.ico",

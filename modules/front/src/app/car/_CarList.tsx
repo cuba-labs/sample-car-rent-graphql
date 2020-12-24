@@ -1,31 +1,7 @@
 import * as React from "react";
-import { observer } from "mobx-react";
-import { Link } from "react-router-dom";
-import { IReactionDisposer, reaction } from "mobx";
-import {Modal, Button, Card, Icon, message, Input} from "antd";
-import {
-  injectMainStore,
-  MainStoreInjected
-} from "@cuba-platform/react-core";
-import {
-  EntityProperty,
-  Paging,
-  setPagination,
-  Spinner
-} from "@cuba-platform/react-ui";
 import { Car } from "../../cuba/entities/scr$Car";
-import {ConditionsGroup, SerializedEntity} from "@cuba-platform/rest";
-import { CarCrud } from "./CarCrud";
-import {
-  FormattedMessage,
-  injectIntl,
-  WrappedComponentProps
-} from "react-intl";
 import { PaginationConfig } from "antd/es/pagination";
-import {ApolloClient, gql, InMemoryCache, useQuery} from '@apollo/client';
-import {GroupCondition} from '../../cuba/entities/base/sec$GroupCondition';
-import Search from 'antd/es/input/Search';
-import {useState} from 'react';
+import {gql, useQuery} from '@apollo/client';
 
 const CAR_LIST = gql`
     query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
@@ -36,7 +12,7 @@ const CAR_LIST = gql`
     }
 `;
 
-const CarList = (props: {
+const _CarList = (props: {
     paginationConfig: PaginationConfig;
     onPagingChange: (current: number, pageSize: number) => void;
   }) => {
@@ -86,7 +62,7 @@ const CarList = (props: {
   );
 };
 
-export default CarList;
+export default _CarList;
 
 // type Props = MainStoreInjected &
 //   WrappedComponentProps & {

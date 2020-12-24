@@ -5,7 +5,7 @@ class HomePage extends React.Component {
   render() {
     return (
       <div>
-        <FormattedMessage id="home.welcome" /> sample-car-rent-graphql!
+        <FormattedMessage id="home.welcome" /> sample-car-rent!
       </div>
     );
   }
