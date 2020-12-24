@@ -1,6 +1,6 @@
 {
   "name": "Untitled GraphQL Schema",
-  "schemaPath": "modules/core/test/fixtures/schema-current.graphql",
+  "schemaPath": "schema-current.graphql",
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
