@@ -1,3 +1,4 @@
+import { CarCrud } from "./app/car/CarCrud";
 import { getMenuItems } from "@cuba-platform/react-core";
 
 export const menuItems = getMenuItems();
@@ -20,3 +21,10 @@ const userSettingsSubMenu = {
 // Add sub menu item to menu config
 menuItems.push(userSettingsSubMenu);
 */
+
+menuItems.push({
+  pathPattern: "/carCrud/:entityId?",
+  menuLink: "/carCrud",
+  component: CarCrud,
+  caption: "CarCrud"
+});
