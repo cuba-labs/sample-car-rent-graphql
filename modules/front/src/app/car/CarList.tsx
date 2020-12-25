@@ -20,20 +20,6 @@ type Props = {
   onPagingChange: (current: number, pageSize: number) => void;
 };
 
-const FIELDS = [
-  "manufacturer",
-  "model",
-  "regNumber",
-  "purchaseDate",
-  "manufactureDate",
-  "wheelOnRight",
-  "carType",
-  "ecoRank",
-  "maxPassengers",
-  "price",
-  "mileage"
-];
-
 const CAR_LIST = gql`
     query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
         carList(filter: $filter, limit: $limit, offset: $offset, sort: $sort) {
@@ -130,14 +116,14 @@ const CarList = (props: Props) => {
               ]}
             >
               <div style={{ flexGrow: 1 }}>
-                {FIELDS.map(p => (
+                {getFields(item, false).map((p => (
                   <EntityProperty
                     entityName={Car.NAME}
                     propertyName={p}
                     value={item[p]}
                     key={p}
                   />
-                ))}
+                )))}
               </div>
             </List.Item>
           )}
@@ -156,5 +142,15 @@ const CarList = (props: Props) => {
     );
   });
 };
+
+// TODO Move to react-core?
+export function getFields(item: SerializedEntity<Car>, isStringEntity: boolean): string[] {
+  const ignoredProperties = ['__typename'];
+  if (!isStringEntity) {
+    ignoredProperties.push('id');
+  }
+  return Object.keys(item)
+    .filter(key => !ignoredProperties.includes(key));
+}
 
 export default CarList;

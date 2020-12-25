@@ -14,10 +14,10 @@ import {
 import {
   loadAssociationOptions,
   DataCollectionStore,
-  useInstance,
   MainStore,
   useMainStore,
-  useReaction
+  useReaction,
+  instanceItemToFormFields
 } from "@cuba-platform/react-core";
 import { Field, MultilineText, Spinner } from "@cuba-platform/react-ui";
 import "../../app/App.css";
@@ -25,6 +25,9 @@ import { Car } from "../../cuba/entities/scr$Car";
 import { Garage } from "../../cuba/entities/scr$Garage";
 import { TechnicalCertificate } from "../../cuba/entities/scr$TechnicalCertificate";
 import { FileDescriptor } from "../../cuba/entities/base/sys$FileDescriptor";
+import { gql, useQuery } from "@apollo/client";
+import { SerializedEntity, MetaClassInfo } from "@cuba-platform/rest";
+import { getFields } from "./CarList";
 
 type Props = {
   entityId: string;
@@ -41,23 +44,6 @@ type CarEditLocalStore = CarEditAssociationOptions & {
   globalErrors: string[];
   formRef: RefObject<FormInstance>;
 };
-
-const FIELDS = [
-  "manufacturer",
-  "model",
-  "regNumber",
-  "purchaseDate",
-  "manufactureDate",
-  "wheelOnRight",
-  "carType",
-  "ecoRank",
-  "maxPassengers",
-  "price",
-  "mileage",
-  "garage",
-  "technicalCertificate",
-  "photo"
-];
 
 const isNewEntity = (entityId: string) => {
   return entityId === NEW_SUBPATH;
@@ -96,6 +82,24 @@ const getAssociationOptions = (
   return associationOptions;
 };
 
+const CAR_BY_ID = gql`
+  query CarById($id: String) {
+      carById(id: $id) {
+          manufacturer
+          model
+          regNumber
+          purchaseDate
+          manufactureDate
+          wheelOnRight
+          carType
+          ecoRank
+          maxPassengers
+          price
+          mileage
+      }
+  }
+`;
+
 const CarEdit = (props: Props) => {
   const { entityId } = props;
 
@@ -103,9 +107,10 @@ const CarEdit = (props: Props) => {
   const mainStore = useMainStore();
   const [form] = useForm();
 
-  const dataInstance = useInstance<Car>(Car.NAME, {
-    view: "car-edit",
-    loadImmediately: false
+  const {loading, error, data} = useQuery(CAR_BY_ID, {
+    variables: {
+      id: entityId
+    }
   });
 
   const store: CarEditLocalStore = useLocalStore(() => ({
@@ -120,26 +125,26 @@ const CarEdit = (props: Props) => {
     formRef: React.createRef()
   }));
 
-  useEffect(() => {
-    if (isNewEntity(entityId)) {
-      dataInstance.current.setItem(new Car());
-    } else {
-      dataInstance.current.load(entityId);
-    }
-  }, [entityId, dataInstance]);
+  // useEffect(() => {
+  //   if (isNewEntity(entityId)) {
+  //     dataInstance.current.setItem(new Car());
+  //   } else {
+  //     dataInstance.current.load(entityId);
+  //   }
+  // }, [entityId, dataInstance]);
 
-  // Create a reaction that displays request failed error message
-  useReaction(
-    () => dataInstance.current.status,
-    () => {
-      if (
-        dataInstance.current.lastError != null &&
-        dataInstance.current.lastError !== "COMMIT_ERROR"
-      ) {
-        message.error(intl.formatMessage({ id: "common.requestFailed" }));
-      }
-    }
-  );
+  // // Create a reaction that displays request failed error message
+  // useReaction(
+  //   () => dataInstance.current.status,
+  //   () => {
+  //     if (
+  //       dataInstance.current.lastError != null &&
+  //       dataInstance.current.lastError !== "COMMIT_ERROR"
+  //     ) {
+  //       message.error(intl.formatMessage({ id: "common.requestFailed" }));
+  //     }
+  //   }
+  // );
 
   // Create a reaction that waits for permissions data to be loaded,
   // loads Association options and disposes itself
@@ -157,16 +162,25 @@ const CarEdit = (props: Props) => {
     { fireImmediately: true }
   );
 
-  // Create a reaction that sets the fields values based on dataInstance.current.item
-  useReaction(
-    () => [store.formRef.current, dataInstance.current.item],
-    ([formInstance]) => {
-      if (formInstance != null) {
-        form.setFieldsValue(dataInstance.current.getFieldValues(FIELDS));
-      }
-    },
-    { fireImmediately: true }
-  );
+  // // Create a reaction that sets the fields values based on dataInstance.current.item
+  // useReaction(
+  //   () => [store.formRef.current, dataInstance.current.item],
+  //   ([formInstance]) => {
+  //     if (formInstance != null) {
+  //       form.setFieldsValue(dataInstance.current.getFieldValues(FIELDS));
+  //     }
+  //   },
+  //   { fireImmediately: true }
+  // );
+  useEffect(() => {
+    if (store.formRef.current != null && !loading && error == null) {
+      form.setFieldsValue(adaptForAnt<Car>(
+        data.carById,
+        Car.NAME,
+        mainStore.metadata
+      ));
+    }
+  });
 
   const handleFinishFailed = useCallback(() => {
     message.error(
@@ -174,57 +188,56 @@ const CarEdit = (props: Props) => {
     );
   }, [intl]);
 
-  const handleFinish = useCallback(
-    (values: { [field: string]: any }) => {
-      if (form != null) {
-        defaultHandleFinish(
-          values,
-          dataInstance.current,
-          intl,
-          form,
-          isNewEntity(entityId) ? "create" : "edit"
-        ).then(({ success, globalErrors }) => {
-          if (success) {
-            store.updated = true;
-          } else {
-            store.globalErrors = globalErrors;
-          }
-        });
-      }
-    },
-    [entityId, intl, form, store.globalErrors, store.updated, dataInstance]
-  );
+  // const handleFinish = useCallback(
+  //   (values: { [field: string]: any }) => {
+  //     if (form != null) {
+  //       defaultHandleFinish(
+  //         values,
+  //         dataInstance.current,
+  //         intl,
+  //         form,
+  //         isNewEntity(entityId) ? "create" : "edit"
+  //       ).then(({ success, globalErrors }) => {
+  //         if (success) {
+  //           store.updated = true;
+  //         } else {
+  //           store.globalErrors = globalErrors;
+  //         }
+  //       });
+  //     }
+  //   },
+  //   [entityId, intl, form, store.globalErrors, store.updated, dataInstance]
+  // );
 
   return useObserver(() => {
     if (store.updated) {
       return <Redirect to={PATH} />;
     }
 
-    if (!mainStore.isEntityDataLoaded()) {
+    if (loading) {
       return <Spinner />;
     }
 
-    const { status, lastError, load } = dataInstance.current;
-
-    // do not stop on "COMMIT_ERROR" - it could be bean validation, so we should show fields with errors
-    if (status === "ERROR" && lastError === "LOAD_ERROR") {
-      return (
-        <>
-          <FormattedMessage id="common.requestFailed" />.
-          <br />
-          <br />
-          <Button htmlType="button" onClick={() => load(entityId)}>
-            <FormattedMessage id="common.retry" />
-          </Button>
-        </>
-      );
-    }
+    // TODO errors
+    // // do not stop on "COMMIT_ERROR" - it could be bean validation, so we should show fields with errors
+    // if (status === "ERROR" && lastError === "LOAD_ERROR") {
+    //   return (
+    //     <>
+    //       <FormattedMessage id="common.requestFailed" />.
+    //       <br />
+    //       <br />
+    //       <Button htmlType="button" onClick={() => load(entityId)}>
+    //         <FormattedMessage id="common.retry" />
+    //       </Button>
+    //     </>
+    //   );
+    // }
 
     return (
       <Card className="narrow-layout">
         <Form
-          onFinish={handleFinish}
-          onFinishFailed={handleFinishFailed}
+          // onFinish={handleFinish}
+          // onFinishFailed={handleFinishFailed}
           layout="vertical"
           ref={store.formRef}
           form={form}
@@ -365,8 +378,8 @@ const CarEdit = (props: Props) => {
             <Button
               type="primary"
               htmlType="submit"
-              disabled={status !== "DONE" && status !== "ERROR"}
-              loading={status === "LOADING"}
+              // disabled={status !== "DONE" && status !== "ERROR"} TODO Client-side validation
+              loading={loading}
               style={{ marginLeft: "8px" }}
             >
               <FormattedMessage id="common.submit" />
@@ -377,5 +390,20 @@ const CarEdit = (props: Props) => {
     );
   });
 };
+
+// TODO get rid of any and !
+// TODO move to react-ui
+// TODO will get metadata via graphql in future?
+function adaptForAnt<T>(
+  item: Record<string, any>,
+  entityName: string,
+  metadata?: MetaClassInfo[],
+  stringIdName?: string
+): Record<string, any> {
+  const displayedProperties = getFields(item, stringIdName != null); // TODO
+
+  // TODO Refactgor instanceItemToFormFields, move to react-ui
+  return instanceItemToFormFields(item, entityName, metadata!, displayedProperties, stringIdName)
+}
 
 export default CarEdit;
