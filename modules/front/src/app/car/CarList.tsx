@@ -1,24 +1,19 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import { useObserver } from "mobx-react";
 import { Link } from "react-router-dom";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Modal, Button, List, message } from "antd";
 import {
-  useCollection,
-  useMainStore,
-  useReaction
-} from "@cuba-platform/react-core";
-import {
   EntityProperty,
   Paging,
-  setPagination,
-  Spinner
 } from "@cuba-platform/react-ui";
 import { Car } from "../../cuba/entities/scr$Car";
 import { SerializedEntity } from "@cuba-platform/rest";
 import { PATH, NEW_SUBPATH } from "./CarCrud";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PaginationConfig } from "antd/es/pagination";
+import {gql, useQuery, useMutation} from '@apollo/client';
+import {CenteredLoader} from '../CenteredLoader';
 
 type Props = {
   paginationConfig: PaginationConfig;
@@ -39,33 +34,44 @@ const FIELDS = [
   "mileage"
 ];
 
+const CAR_LIST = gql`
+    query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
+        carList(filter: $filter, limit: $limit, offset: $offset, sort: $sort) {
+            id
+            manufacturer
+            model
+        }
+    }
+`;
+
+const DELETE_CAR = gql`
+  mutation DeleteCar($id: UUID!) {
+      deleteCar(id: $id)
+  }
+`;
+
 const CarList = (props: Props) => {
   const { paginationConfig, onPagingChange } = props;
 
   const intl = useIntl();
-  const mainStore = useMainStore();
 
-  const dataCollection = useCollection<Car>(Car.NAME, {
-    view: "_base",
-    sort: "-updateTs",
-    loadImmediately: false
+  let limit = 10;
+  let offset = 0;
+  const {loading, error, data} = useQuery(CAR_LIST, {
+    variables: {
+      limit,
+      offset
+    }
   });
 
-  useEffect(() => {
-    setPagination(paginationConfig, dataCollection.current, true);
-  }, [paginationConfig, dataCollection]);
+  const [deleteCar] = useMutation(DELETE_CAR);
 
-  useReaction(
-    () => dataCollection.current.status,
-    status => {
-      if (status === "ERROR") {
-        message.error(intl.formatMessage({ id: "common.requestFailed" }));
-      }
-    }
-  );
+  // TODO implement pagination
 
+  // TODO deletion mutation
   const showDeletionDialog = useCallback(
     (e: SerializedEntity<Car>) => {
+      console.log('e', e);
       Modal.confirm({
         title: intl.formatMessage(
           { id: "management.browser.delete.areYouSure" },
@@ -76,18 +82,23 @@ const CarList = (props: Props) => {
         }),
         cancelText: intl.formatMessage({ id: "common.cancel" }),
         onOk: () => {
-          return dataCollection.current.delete(e);
+          if (e.id != null) {
+            console.log('wtf?', e.id);
+            deleteCar({variables: {id: e.id}});
+          }
         }
       });
     },
-    [intl, dataCollection]
+    [intl, deleteCar]
   );
 
   return useObserver(() => {
-    const { status, items, count } = dataCollection.current;
+    if (loading) {
+      return <CenteredLoader/>;
+    }
 
-    if (status === "LOADING" || mainStore?.isEntityDataLoaded() !== true) {
-      return <Spinner />;
+    if (error != null) {
+      message.error(intl.formatMessage({ id: "common.requestFailed" }));
     }
 
     return (
@@ -105,8 +116,8 @@ const CarList = (props: Props) => {
         <List
           itemLayout="horizontal"
           bordered
-          dataSource={items}
-          renderItem={item => (
+          dataSource={data.carList}
+          renderItem={(item: SerializedEntity<Car>) => (
             <List.Item
               actions={[
                 <DeleteOutlined
@@ -137,7 +148,7 @@ const CarList = (props: Props) => {
             <Paging
               paginationConfig={paginationConfig}
               onPagingChange={onPagingChange}
-              total={count}
+              // total={count}
             />
           </div>
         )}
