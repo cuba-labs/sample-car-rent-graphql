@@ -16,6 +16,7 @@ import { antdLocaleMapping, messagesMapping } from "./i18n/i18nMappings";
 import "moment/locale/ru";
 import "moment/locale/fr";
 import {ApolloClient, ApolloProvider, InMemoryCache} from '@apollo/client';
+import { createApolloClient } from "./gql";
 
 export const cubaREST = initializeApp({
   name: "scr",
@@ -26,10 +27,7 @@ export const cubaREST = initializeApp({
   defaultLocale: "en"
 });
 
-const client = new ApolloClient({
-  uri: 'http://localhost:8080/app-portal/graphql',
-  cache: new InMemoryCache()
-});
+const client = createApolloClient();
 
 ReactDOM.render(
   <CubaAppProvider cubaREST={cubaREST}>

@@ -7,6 +7,28 @@ import logo from "./logo.png";
 import { injectMainStore, MainStoreInjected } from "@cuba-platform/react-core";
 import { LanguageSwitcher } from "../../i18n/LanguageSwitcher";
 import { injectIntl, WrappedComponentProps } from "react-intl";
+import {gql, useQuery} from "@apollo/client";
+
+const TEST_LOCAL_STATE = gql`
+  query TestLocalState {
+      testLocalState @client
+  }
+`;
+
+const TestLocalState: React.FC = () => {
+  const {loading, error, data} = useQuery(TEST_LOCAL_STATE);
+
+  if (loading) {
+    return <>Loading...</>;
+  }
+  if (error != null) {
+    return <>Error</>;
+  }
+
+  console.log('data', data);
+
+  return <>{data?.testLocalState}</>;
+};
 
 @injectMainStore
 @observer
@@ -27,6 +49,7 @@ class AppHeader extends React.Component<
         <div className="user-panel">
           <LanguageSwitcher className="panelelement language-switcher -header" />
           <span className="panelelement">{appState.userName}</span>
+          <TestLocalState/>
           <Button
             className="panelelement"
             id="button_logout"
