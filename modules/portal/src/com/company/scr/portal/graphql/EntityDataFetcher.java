@@ -26,6 +26,7 @@ public class EntityDataFetcher {
             log.warn("id {}", id);
 
             LoadContext<E> lc = new LoadContext<>(entityClass);
+            // todo support not only UUID types of id
             lc.setId(UUID.fromString(id));
             lc.setView(DataFetcherUtils.buildView(entityClass, environment));
 

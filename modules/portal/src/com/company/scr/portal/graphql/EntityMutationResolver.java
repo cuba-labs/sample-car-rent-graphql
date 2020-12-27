@@ -55,7 +55,8 @@ public class EntityMutationResolver {
 
     public DataFetcher deleteEntity(Class<Entity> entityClass) {
         return environment -> {
-            UUID id = environment.getArgument("id");
+            // todo support not only UUID types of id
+            UUID id = UUID.fromString(environment.getArgument("id"));
             log.warn("deleteEntity: id {}", id);
             Id entityId = Id.of(id, entityClass);
             dataManager.remove(entityId);

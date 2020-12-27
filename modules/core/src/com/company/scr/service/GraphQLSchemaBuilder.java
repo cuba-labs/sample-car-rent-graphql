@@ -100,30 +100,20 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
             GraphQLInputType inputType = inputClassCache.get(aClass);
             GraphQLOutputType outType = (GraphQLOutputType) classCache.get(aClass);
 
-            GraphQLArgument createEntityArgument = GraphQLArgument.newArgument()
-                    .name(GraphQLNamingUtils.uncapitalizedSimpleName(aClass))
-                    .type(GraphQLNonNull.nonNull(inputType))
-                    .build();
-
             // mutation createCar(car: scr_Car)
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("create" + aClass.getSimpleName())
                             .type(outType)
-                            .argument(createEntityArgument)
+                            .argument(argNonNull(GraphQLNamingUtils.uncapitalizedSimpleName(aClass), inputType))
                             .build());
-
-            GraphQLArgument deleteEntityArgument = GraphQLArgument.newArgument()
-                    .name("id")
-                    .type(GraphQLNonNull.nonNull(new GraphQLTypeReference("UUID")))
-                    .build();
 
             // mutation deleteCar(id: UUID)
             fields.add(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("delete" + aClass.getSimpleName())
                             .type(JavaScalars.GraphQLVoid)
-                            .argument(deleteEntityArgument)
+                            .argument(argNonNull("id", "String"))
                             .build());
         });
 
@@ -157,7 +147,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(GraphQLNamingUtils.composeByIdQueryName(aClass))
                             .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
-                            .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
+                            .argument(argNonNull("id", "String"))
                             .build());
 
             // query 'countCars()'
@@ -323,6 +313,22 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
     private static GraphQLArgument.Builder arg(String name, String typeRef) {
         return GraphQLArgument.newArgument()
                 .name(name).type(GraphQLTypeReference.typeRef(typeRef));
+    }
+
+    /**
+     * Shortcut for not null query argument builder
+     *
+     * @param name argument name
+     * @param type argument type
+     * @return argument
+     */
+    private static GraphQLArgument.Builder argNonNull(String name, GraphQLType type) {
+        return GraphQLArgument.newArgument()
+                .name(name).type(GraphQLNonNull.nonNull(type));
+    }
+
+    private static GraphQLArgument.Builder argNonNull(String name, String typeRef) {
+        return argNonNull(name, GraphQLTypeReference.typeRef(typeRef));
     }
 
 }
