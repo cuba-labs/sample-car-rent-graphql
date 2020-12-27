@@ -1,5 +1,6 @@
 package com.company.scr.portal.controllers;
 
+import com.company.scr.graphql.GraphQLConstants;
 import com.company.scr.portal.graphql.GraphQLPortalService;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.LoadContext;
@@ -47,9 +48,10 @@ public class PortalController {
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/graphql")
     public ResponseEntity<Object> graphql(@RequestBody Map<String, Object> requestBody) {
-        String query = (String) requestBody.get("query");
+        String query = (String) requestBody.get(GraphQLConstants.QUERY);
+        Map<String, Object> variables = (Map<String, Object>) requestBody.get(GraphQLConstants.VARIABLES);
         log.warn("graphql query '{}'", query);
-        ExecutionResult result = graphQLPortalService.executeGraphQL(query);
+        ExecutionResult result = graphQLPortalService.executeGraphQL(query, variables);
         ResponseEntity<Object> body = ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(result);
         log.trace("graphql return {}", body);
         return body;

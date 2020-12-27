@@ -6,11 +6,13 @@ import com.company.scr.entity.test.CompositionO2OTestEntity;
 import com.company.scr.entity.test.DatatypesTestEntity;
 import com.company.scr.entity.test.DatatypesTestEntity2;
 import com.company.scr.entity.test.DatatypesTestEntity3;
+import com.company.scr.graphql.GraphQLConstants;
 import com.company.scr.graphql.GraphQLNamingUtils;
 import com.company.scr.graphql.JavaScalars;
 import com.company.scr.service.GraphQLService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.security.entity.User;
+import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -18,9 +20,12 @@ import graphql.schema.idl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.util.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Map;
 
 
 @Component
@@ -67,13 +72,18 @@ public class GraphQLPortalService {
         graphQL = GraphQL.newGraphQL(graphQLSchema).build();
     }
 
-    public ExecutionResult executeGraphQL(String query) {
+    public ExecutionResult executeGraphQL(String query, @Nullable Map<String, Object> variables) {
         if (graphQL == null) {
             initGql();
         }
 
         log.info("executeGraphQL: query {}", query);
-        ExecutionResult result = graphQL.execute(query);
+        ExecutionInput.Builder executionInput = ExecutionInput.newExecutionInput().query(query);
+        if (variables != null) {
+            executionInput.variables(variables);
+        }
+
+        ExecutionResult result = graphQL.execute(executionInput);
         log.info("executeGraphQL result {}", result);
         return result;
     }
@@ -92,17 +102,17 @@ public class GraphQLPortalService {
                                           Class<Entity>... entityClasses) {
 
         Arrays.stream(entityClasses).forEach(aClass -> {
-            rwBuilder.type("Query", typeWiring -> typeWiring
+            rwBuilder.type(StringUtils.capitalize(GraphQLConstants.QUERY), typeWiring -> typeWiring
                     .dataFetcher(GraphQLNamingUtils.composeListQueryName(aClass), collectionDataFetcher.loadEntities(aClass))
                     .dataFetcher(GraphQLNamingUtils.composeByIdQueryName(aClass), entityDataFetcher.loadEntity(aClass))
                     .dataFetcher(GraphQLNamingUtils.composeCountQueryName(aClass), collectionDataFetcher.countEntities(aClass))
             );
 
-            rwBuilder.type("Mutation", typeWiring -> typeWiring
+            rwBuilder.type(StringUtils.capitalize(GraphQLConstants.MUTATION), typeWiring -> typeWiring
                     .dataFetcher("create" + aClass.getSimpleName(), entityMutationResolver.createEntity(aClass))
             );
 
-            rwBuilder.type("Mutation", typeWiring -> typeWiring
+            rwBuilder.type(StringUtils.capitalize(GraphQLConstants.MUTATION), typeWiring -> typeWiring
                     .dataFetcher("delete" + aClass.getSimpleName(), entityMutationResolver.deleteEntity(aClass))
             );
 
