@@ -204,7 +204,9 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
         GraphQLObjectType outAnswer = GraphQLObjectType.newObject()
                 .name(entityType.getName().replaceAll("\\$", "_"))
                 .fields(entityType.getAttributes().stream().filter(this::isNotIgnored).flatMap(this::getObjectField)
-                        .collect(Collectors.toList())).build();
+                        .collect(Collectors.toList()))
+                .field(GraphQLTypes.outStringField(GraphQLConstants.SYS_ATTR_INSTANCE_NAME))
+                .build();
 
         GraphQLInputObjectType inputType = buildInputType(entityType);
 

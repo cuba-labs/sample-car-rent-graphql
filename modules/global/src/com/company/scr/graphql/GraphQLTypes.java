@@ -4,11 +4,13 @@ import graphql.schema.*;
 
 public class GraphQLTypes {
 
+    public static final GraphQLTypeReference TYPE_REFERENCE_STRING = GraphQLTypeReference.typeRef("String");
+
     public static GraphQLInputObjectType Condition = GraphQLInputObjectType.newInputObject()
             .name("Condition")
-            .field(stringField("property"))
-            .field(stringField("operator"))
-            .field(stringField("value"))
+            .field(inpStringField("property"))
+            .field(inpStringField("operator"))
+            .field(inpStringField("value"))
             .build();
 
     public static GraphQLEnumType GroupConditionType = GraphQLEnumType.newEnum()
@@ -32,13 +34,25 @@ public class GraphQLTypes {
     }
 
     /**
-     * Shortcut for type string field builder
+     * Shortcut for input type string field builder
      *
      * @param fieldName field name
      * @return field
      */
-    public static GraphQLInputObjectField.Builder stringField(String fieldName) {
-        return field(fieldName, GraphQLTypeReference.typeRef("String"));
+    public static GraphQLInputObjectField.Builder inpStringField(String fieldName) {
+        return field(fieldName, TYPE_REFERENCE_STRING);
+    }
+
+    /**
+     * Shortcut for output type string field builder
+     *
+     * @param fieldName field name
+     * @return field
+     */
+    public static GraphQLFieldDefinition.Builder outStringField(String fieldName) {
+        return GraphQLFieldDefinition.newFieldDefinition()
+                .name(fieldName)
+                .type(TYPE_REFERENCE_STRING);
     }
 
 }
