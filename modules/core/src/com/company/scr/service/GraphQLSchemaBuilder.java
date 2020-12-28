@@ -113,6 +113,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("delete" + aClass.getSimpleName())
                             .type(JavaScalars.GraphQLVoid)
+                            // todo we need to define 'id' arg type depends on entity id type
                             .argument(argNonNull("id", "String"))
                             .build());
         });
@@ -147,6 +148,7 @@ public class GraphQLSchemaBuilder extends GraphQLInputTypesBuilder {
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name(GraphQLNamingUtils.composeByIdQueryName(aClass))
                             .type(new GraphQLTypeReference("scr_" + aClass.getSimpleName()))
+                            // todo we need to define 'id' arg type depends on entity id type
                             .argument(argNonNull("id", "String"))
                             .build());
 
