@@ -12,7 +12,7 @@ import { SerializedEntity } from "@cuba-platform/rest";
 import { PATH, NEW_SUBPATH } from "./CarCrud";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PaginationConfig } from "antd/es/pagination";
-import {gql, useQuery, useMutation} from '@apollo/client';
+import {gql, useQuery, useMutation, Reference} from '@apollo/client';
 import {CenteredLoader} from '../CenteredLoader';
 
 type Props = {
@@ -20,9 +20,11 @@ type Props = {
   onPagingChange: (current: number, pageSize: number) => void;
 };
 
+// TODO instanceName will become _instanceName
 const CAR_LIST = gql`
     query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
         carList(filter: $filter, limit: $limit, offset: $offset, sort: $sort) {
+            instanceName
             id
             manufacturer
             model
@@ -31,7 +33,7 @@ const CAR_LIST = gql`
 `;
 
 const DELETE_CAR = gql`
-  mutation DeleteCar($id: UUID!) {
+  mutation DeleteCar($id: String!) {
       deleteCar(id: $id)
   }
 `;
@@ -61,7 +63,8 @@ const CarList = (props: Props) => {
       Modal.confirm({
         title: intl.formatMessage(
           { id: "management.browser.delete.areYouSure" },
-          { instanceName: e._instanceName }
+          // TODO instanceName will become _instanceName
+          { instanceName: (e as any).instanceName }
         ),
         okText: intl.formatMessage({
           id: "management.browser.delete.ok"
@@ -69,8 +72,20 @@ const CarList = (props: Props) => {
         cancelText: intl.formatMessage({ id: "common.cancel" }),
         onOk: () => {
           if (e.id != null) {
-            console.log('wtf?', e.id);
-            deleteCar({variables: {id: e.id}});
+            deleteCar({
+              variables: {id: e.id},
+              update(cache) {
+                cache.modify({
+                  fields: {
+                    carList(existingRefs, { readField }) {
+                      return existingRefs.filter(
+                        (ref: Reference) => e.id !== readField('id', ref)
+                      );
+                    }
+                  }
+                })
+              }
+            });
           }
         }
       });
@@ -145,7 +160,8 @@ const CarList = (props: Props) => {
 
 // TODO Move to react-core?
 export function getFields(item: SerializedEntity<Car>, isStringEntity: boolean): string[] {
-  const ignoredProperties = ['__typename'];
+  // TODO instanceName will become _instanceName
+  const ignoredProperties = ['__typename', 'instanceName'];
   if (!isStringEntity) {
     ignoredProperties.push('id');
   }
