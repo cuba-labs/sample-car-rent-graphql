@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useObserver } from "mobx-react";
 import { Link } from "react-router-dom";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
@@ -12,7 +12,7 @@ import { SerializedEntity } from "@cuba-platform/rest";
 import { PATH, NEW_SUBPATH } from "./CarCrud";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PaginationConfig } from "antd/es/pagination";
-import {gql, useQuery, useMutation, Reference} from '@apollo/client';
+import {gql, useMutation, Reference, useLazyQuery} from '@apollo/client';
 import {CenteredLoader} from '../CenteredLoader';
 
 type Props = {
@@ -43,18 +43,14 @@ const CarList = (props: Props) => {
 
   const intl = useIntl();
 
-  let limit = 10;
-  let offset = 0;
-  const {loading, error, data} = useQuery(CAR_LIST, {
-    variables: {
-      limit,
-      offset
-    }
-  });
-
+  const [doFetch, {loading, error, data}] = useLazyQuery(CAR_LIST);
   const [deleteCar] = useMutation(DELETE_CAR);
 
-  // TODO implement pagination
+  useEffect(() => {
+    doFetch({
+      variables: toLimitAndOffset(paginationConfig)
+    });
+  }, [paginationConfig]);
 
   // TODO deletion mutation
   const showDeletionDialog = useCallback(
@@ -94,7 +90,7 @@ const CarList = (props: Props) => {
   );
 
   return useObserver(() => {
-    if (loading) {
+    if (loading || data == null) {
       return <CenteredLoader/>;
     }
 
@@ -149,7 +145,7 @@ const CarList = (props: Props) => {
             <Paging
               paginationConfig={paginationConfig}
               onPagingChange={onPagingChange}
-              // total={count}
+              total={50} // TODO hardcoded value, count not supported
             />
           </div>
         )}
@@ -157,6 +153,29 @@ const CarList = (props: Props) => {
     );
   });
 };
+
+function toLimitAndOffset(paginationConfig: PaginationConfig): {limit: number | undefined, offset: number | undefined} {
+  const {disabled, current, pageSize} = paginationConfig;
+
+  if (disabled) {
+    return {
+      limit: undefined,
+      offset: undefined
+    };
+  }
+
+  if (pageSize != null && current != null) {
+    return {
+      limit: pageSize,
+      offset: pageSize * (current - 1)
+    }
+  }
+
+  return {
+    limit: undefined,
+    offset: undefined
+  };
+}
 
 // TODO Move to react-core?
 export function getFields(item: SerializedEntity<Car>, isStringEntity: boolean): string[] {
