@@ -29,6 +29,15 @@ const CAR_LIST = gql`
             id
             manufacturer
             model
+            regNumber
+            purchaseDate
+            manufactureDate
+            wheelOnRight
+            carType
+            ecoRank
+            maxPassengers
+            price
+            mileage
         }
     }
 `;
@@ -96,6 +105,7 @@ const CarList = (props: Props) => {
     }
 
     if (error != null) {
+      console.error(error);
       message.error(intl.formatMessage({ id: "common.requestFailed" }));
     }
 

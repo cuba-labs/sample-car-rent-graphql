@@ -25,7 +25,7 @@ import { Car } from "../../cuba/entities/scr$Car";
 import { Garage } from "../../cuba/entities/scr$Garage";
 import { TechnicalCertificate } from "../../cuba/entities/scr$TechnicalCertificate";
 import { FileDescriptor } from "../../cuba/entities/base/sys$FileDescriptor";
-import { gql, useQuery } from "@apollo/client";
+import {gql, useMutation, useQuery} from "@apollo/client";
 import { SerializedEntity, MetaClassInfo } from "@cuba-platform/rest";
 import { getFields } from "./CarList";
 
@@ -49,54 +49,68 @@ const isNewEntity = (entityId: string) => {
   return entityId === NEW_SUBPATH;
 };
 
-const getAssociationOptions = (
-  mainStore: MainStore
-): CarEditAssociationOptions => {
-  const { getAttributePermission } = mainStore.security;
-  const associationOptions: CarEditAssociationOptions = {};
+// const getAssociationOptions = (
+//   mainStore: MainStore
+// ): CarEditAssociationOptions => {
+//   const { getAttributePermission } = mainStore.security;
+//   const associationOptions: CarEditAssociationOptions = {};
+//
+//   associationOptions.garagesDc = loadAssociationOptions(
+//     Car.NAME,
+//     "garage",
+//     Garage.NAME,
+//     getAttributePermission,
+//     { view: "_minimal" }
+//   );
+//
+//   associationOptions.technicalCertificatesDc = loadAssociationOptions(
+//     Car.NAME,
+//     "technicalCertificate",
+//     TechnicalCertificate.NAME,
+//     getAttributePermission,
+//     { view: "_minimal" }
+//   );
+//
+//   associationOptions.photosDc = loadAssociationOptions(
+//     Car.NAME,
+//     "photo",
+//     FileDescriptor.NAME,
+//     getAttributePermission,
+//     { view: "_minimal" }
+//   );
+//
+//   return associationOptions;
+// };
 
-  associationOptions.garagesDc = loadAssociationOptions(
-    Car.NAME,
-    "garage",
-    Garage.NAME,
-    getAttributePermission,
-    { view: "_minimal" }
-  );
-
-  associationOptions.technicalCertificatesDc = loadAssociationOptions(
-    Car.NAME,
-    "technicalCertificate",
-    TechnicalCertificate.NAME,
-    getAttributePermission,
-    { view: "_minimal" }
-  );
-
-  associationOptions.photosDc = loadAssociationOptions(
-    Car.NAME,
-    "photo",
-    FileDescriptor.NAME,
-    getAttributePermission,
-    { view: "_minimal" }
-  );
-
-  return associationOptions;
-};
+function getEntityIdFieldName(entityName: String, metadata: MetaClassInfo[]): string {
+  return 'id'; // TODO
+}
 
 const CAR_BY_ID = gql`
-  query CarById($id: String) {
+  query CarById($id: String!) {
       carById(id: $id) {
-          manufacturer
-          model
-          regNumber
-          purchaseDate
-          manufactureDate
-          wheelOnRight
-          carType
-          ecoRank
-          maxPassengers
-          price
-          mileage
+        id
+        manufacturer
+        model
+        regNumber
+        purchaseDate
+        manufactureDate
+        wheelOnRight
+        carType
+        ecoRank
+        maxPassengers
+        price
+        mileage
       }
+  }
+`;
+
+// TODO How to dynamically determine id field name?
+const UPSERT_CAR = gql`
+  mutation UpsertCar($car: inp_scr_Car!) {
+    createCar(car: $car) {
+      id
+    }
   }
 `;
 
@@ -107,11 +121,13 @@ const CarEdit = (props: Props) => {
   const mainStore = useMainStore();
   const [form] = useForm();
 
-  const {loading, error, data} = useQuery(CAR_BY_ID, {
+  const {loading, error, data, refetch} = useQuery(CAR_BY_ID, {
     variables: {
       id: entityId
     }
   });
+
+  const [upsertCar] = useMutation(UPSERT_CAR);
 
   const store: CarEditLocalStore = useLocalStore(() => ({
     // Association options
@@ -148,30 +164,30 @@ const CarEdit = (props: Props) => {
 
   // Create a reaction that waits for permissions data to be loaded,
   // loads Association options and disposes itself
-  useReaction(
-    () => mainStore.security.isDataLoaded,
-    (isDataLoaded, permsReaction) => {
-      if (isDataLoaded === true) {
-        // User permissions has been loaded.
-        // We can now load association options.
-        const associationOptions = getAssociationOptions(mainStore); // Calls REST API
-        Object.assign(store, associationOptions);
-        permsReaction.dispose();
-      }
-    },
-    { fireImmediately: true }
-  );
-
-  // // Create a reaction that sets the fields values based on dataInstance.current.item
   // useReaction(
-  //   () => [store.formRef.current, dataInstance.current.item],
-  //   ([formInstance]) => {
-  //     if (formInstance != null) {
-  //       form.setFieldsValue(dataInstance.current.getFieldValues(FIELDS));
+  //   () => mainStore.security.isDataLoaded,
+  //   (isDataLoaded, permsReaction) => {
+  //     if (isDataLoaded === true) {
+  //       // User permissions has been loaded.
+  //       // We can now load association options.
+  //       const associationOptions = getAssociationOptions(mainStore); // Calls REST API
+  //       Object.assign(store, associationOptions);
+  //       permsReaction.dispose();
   //     }
   //   },
   //   { fireImmediately: true }
   // );
+
+  // Create a reaction that sets the fields values based on dataInstance.current.item
+  useReaction(
+    () => [store.formRef.current, loading, error, data],
+    ([formInstance]) => {
+      if (formInstance != null && !loading && error == null) {
+        form.setFieldsValue(data);
+      }
+    },
+    { fireImmediately: true }
+  );
   useEffect(() => {
     if (store.formRef.current != null && !loading && error == null) {
       form.setFieldsValue(adaptForAnt<Car>(
@@ -188,26 +204,28 @@ const CarEdit = (props: Props) => {
     );
   }, [intl]);
 
-  // const handleFinish = useCallback(
-  //   (values: { [field: string]: any }) => {
-  //     if (form != null) {
-  //       defaultHandleFinish(
-  //         values,
-  //         dataInstance.current,
-  //         intl,
-  //         form,
-  //         isNewEntity(entityId) ? "create" : "edit"
-  //       ).then(({ success, globalErrors }) => {
-  //         if (success) {
-  //           store.updated = true;
-  //         } else {
-  //           store.globalErrors = globalErrors;
-  //         }
-  //       });
-  //     }
-  //   },
-  //   [entityId, intl, form, store.globalErrors, store.updated, dataInstance]
-  // );
+  const handleFinish = useCallback(
+    (values: { [field: string]: any }) => {
+      if (form != null && mainStore.metadata != null) {
+        console.log('values', values);
+        upsertCar({
+          variables: {
+            car: {
+              ...values,
+              [getEntityIdFieldName(Car.NAME, mainStore.metadata)]: entityId
+            }
+          }
+        }).then(({errors}) => {
+          if (errors == null || errors.length === 0) {
+            store.updated = true;
+          } else {
+            console.error(errors); // TODO Error handling
+          }
+        });
+      }
+    },
+    []
+  );
 
   return useObserver(() => {
     if (store.updated) {
@@ -216,6 +234,20 @@ const CarEdit = (props: Props) => {
 
     if (loading) {
       return <Spinner />;
+    }
+
+    if (error != null) {
+      console.error(error);
+      return (
+        <>
+          <FormattedMessage id="common.requestFailed" />.
+          <br />
+          <br />
+          <Button htmlType="button" onClick={() => refetch()}>
+            <FormattedMessage id="common.retry" />
+          </Button>
+        </>
+      );
     }
 
     // TODO errors
@@ -236,7 +268,7 @@ const CarEdit = (props: Props) => {
     return (
       <Card className="narrow-layout">
         <Form
-          // onFinish={handleFinish}
+          onFinish={handleFinish}
           // onFinishFailed={handleFinishFailed}
           layout="vertical"
           ref={store.formRef}
