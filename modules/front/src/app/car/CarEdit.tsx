@@ -25,7 +25,7 @@ import { Car } from "../../cuba/entities/scr$Car";
 import { Garage } from "../../cuba/entities/scr$Garage";
 import { TechnicalCertificate } from "../../cuba/entities/scr$TechnicalCertificate";
 import { FileDescriptor } from "../../cuba/entities/base/sys$FileDescriptor";
-import {gql, useMutation, useQuery} from "@apollo/client";
+import {gql, useMutation, useLazyQuery} from "@apollo/client";
 import { SerializedEntity, MetaClassInfo } from "@cuba-platform/rest";
 import { getFields } from "./CarList";
 
@@ -121,11 +121,7 @@ const CarEdit = (props: Props) => {
   const mainStore = useMainStore();
   const [form] = useForm();
 
-  const {loading, error, data, refetch} = useQuery(CAR_BY_ID, {
-    variables: {
-      id: entityId
-    }
-  });
+  const [doFetch, {loading, error, data}] = useLazyQuery(CAR_BY_ID);
 
   const [upsertCar] = useMutation(UPSERT_CAR);
 
@@ -188,15 +184,26 @@ const CarEdit = (props: Props) => {
     },
     { fireImmediately: true }
   );
+
   useEffect(() => {
-    if (store.formRef.current != null && !loading && error == null) {
-      form.setFieldsValue(adaptForAnt<Car>(
+    if (entityId != null && entityId !== 'new') {
+      doFetch({
+        variables: {
+          id: entityId // TODO dynamic id field name
+        }
+      })
+    }
+  }, [entityId]);
+
+  useEffect(() => {
+    if (store.formRef.current != null && !loading && error == null && data != null) {
+      form.setFieldsValue(jmix2ant<Car>(
         data.carById,
         Car.NAME,
         mainStore.metadata
       ));
     }
-  });
+  }, [store.formRef.current, loading, error, data]);
 
   const handleFinishFailed = useCallback(() => {
     message.error(
@@ -212,7 +219,7 @@ const CarEdit = (props: Props) => {
           variables: {
             car: {
               ...values,
-              [getEntityIdFieldName(Car.NAME, mainStore.metadata)]: entityId
+              ...addIdIfExistingEntity(entityId, mainStore.metadata)
             }
           }
         }).then(({errors}) => {
@@ -243,7 +250,7 @@ const CarEdit = (props: Props) => {
           <FormattedMessage id="common.requestFailed" />.
           <br />
           <br />
-          <Button htmlType="button" onClick={() => refetch()}>
+          <Button htmlType="button" onClick={() => doFetch()}>
             <FormattedMessage id="common.retry" />
           </Button>
         </>
@@ -269,7 +276,7 @@ const CarEdit = (props: Props) => {
       <Card className="narrow-layout">
         <Form
           onFinish={handleFinish}
-          // onFinishFailed={handleFinishFailed}
+          onFinishFailed={handleFinishFailed}
           layout="vertical"
           ref={store.formRef}
           form={form}
@@ -423,10 +430,16 @@ const CarEdit = (props: Props) => {
   });
 };
 
+function addIdIfExistingEntity(entityId: string, metadata: MetaClassInfo[]) {
+  return entityId === 'new'
+    ? undefined
+    : {[getEntityIdFieldName(Car.NAME, metadata)]: entityId};
+}
+
 // TODO get rid of any and !
 // TODO move to react-ui
 // TODO will get metadata via graphql in future?
-function adaptForAnt<T>(
+function jmix2ant<T>(
   item: Record<string, any>,
   entityName: string,
   metadata?: MetaClassInfo[],
@@ -437,5 +450,10 @@ function adaptForAnt<T>(
   // TODO Refactgor instanceItemToFormFields, move to react-ui
   return instanceItemToFormFields(item, entityName, metadata!, displayedProperties, stringIdName)
 }
+
+// TODO
+// function ant2jmix() {
+//
+// }
 
 export default CarEdit;
