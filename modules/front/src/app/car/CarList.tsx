@@ -23,6 +23,7 @@ type Props = {
 // TODO instanceName will become _instanceName
 const CAR_LIST = gql`
     query CarList($filter: GroupCondition, $limit: Int, $offset: Int, $sort: String) {
+        carCount
         carList(filter: $filter, limit: $limit, offset: $offset, sort: $sort) {
             instanceName
             id
@@ -145,7 +146,7 @@ const CarList = (props: Props) => {
             <Paging
               paginationConfig={paginationConfig}
               onPagingChange={onPagingChange}
-              total={50} // TODO hardcoded value, count not supported
+              total={data.carCount}
             />
           </div>
         )}
