@@ -3,18 +3,15 @@ import { Form, Alert, Button, Card, message } from "antd";
 import { FormInstance } from "antd/es/form";
 import useForm from "antd/lib/form/hooks/useForm";
 import { useLocalStore, useObserver } from "mobx-react";
-import { PATH, NEW_SUBPATH } from "./CarCrud";
+import { PATH } from "./CarCrud";
 import { Link, Redirect } from "react-router-dom";
 import { toJS } from "mobx";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  defaultHandleFinish,
   createAntdFormValidationMessages
 } from "@cuba-platform/react-ui";
 import {
-  loadAssociationOptions,
   DataCollectionStore,
-  MainStore,
   useMainStore,
   useReaction,
   instanceItemToFormFields
@@ -26,7 +23,7 @@ import { Garage } from "../../cuba/entities/scr$Garage";
 import { TechnicalCertificate } from "../../cuba/entities/scr$TechnicalCertificate";
 import { FileDescriptor } from "../../cuba/entities/base/sys$FileDescriptor";
 import {gql, useMutation, useLazyQuery} from "@apollo/client";
-import { SerializedEntity, MetaClassInfo } from "@cuba-platform/rest";
+import { MetaClassInfo } from "@cuba-platform/rest";
 import { getFields } from "./CarList";
 
 type Props = {
@@ -45,9 +42,16 @@ type CarEditLocalStore = CarEditAssociationOptions & {
   formRef: RefObject<FormInstance>;
 };
 
-const isNewEntity = (entityId: string) => {
-  return entityId === NEW_SUBPATH;
-};
+// const isNewEntity = (entityId: string) => {
+//   return entityId === NEW_SUBPATH;
+// };
+
+// const GARAGE_OPTIONS = gql`
+//   query GarageList {
+//     instanceName
+//     id
+//   }
+// `;
 
 // const getAssociationOptions = (
 //   mainStore: MainStore
@@ -83,9 +87,10 @@ const isNewEntity = (entityId: string) => {
 // };
 
 function getEntityIdFieldName(entityName: String, metadata: MetaClassInfo[]): string {
-  return 'id'; // TODO
+  return 'id'; // TODO determine the correct name for id field based on metadata
 }
 
+// The list of fields is passed from Stufio
 const CAR_BY_ID = gql`
   query CarById($id: String!) {
       carById(id: $id) {
@@ -105,7 +110,8 @@ const CAR_BY_ID = gql`
   }
 `;
 
-// TODO How to dynamically determine id field name?
+// NOTE: we will replace a single "upsert"-like mutation with separate "create" and "update" mutations
+// TODO A custom directive to dynamically determine the name of id field
 const UPSERT_CAR = gql`
   mutation UpsertCar($car: inp_scr_Car!) {
     createCar(car: $car) {
@@ -121,9 +127,15 @@ const CarEdit = (props: Props) => {
   const mainStore = useMainStore();
   const [form] = useForm();
 
-  const [doFetch, {loading, error, data}] = useLazyQuery(CAR_BY_ID);
+  const [getCar, {loading: queryLoading, error: queryError, data: carData}] = useLazyQuery(CAR_BY_ID);
 
-  const [upsertCar] = useMutation(UPSERT_CAR);
+  const [upsertCar, {loading: upsertLoading}] = useMutation(UPSERT_CAR);
+
+  // const [getGarageOptions, {
+  //   loading: garageOptionsLoading,
+  //   error: garageOptionsError,
+  //   data: garageOptionsData
+  // }] = useLazyQuery(GARAGE_OPTIONS);
 
   const store: CarEditLocalStore = useLocalStore(() => ({
     // Association options
@@ -174,12 +186,12 @@ const CarEdit = (props: Props) => {
   //   { fireImmediately: true }
   // );
 
-  // Create a reaction that sets the fields values based on dataInstance.current.item
+  // Create a reaction that sets the fields values based on query data
   useReaction(
-    () => [store.formRef.current, loading, error, data],
+    () => [store.formRef.current, queryLoading, queryError, carData],
     ([formInstance]) => {
-      if (formInstance != null && !loading && error == null) {
-        form.setFieldsValue(data);
+      if (formInstance != null && !queryLoading && queryError == null) {
+        form.setFieldsValue(carData);
       }
     },
     { fireImmediately: true }
@@ -187,23 +199,23 @@ const CarEdit = (props: Props) => {
 
   useEffect(() => {
     if (entityId != null && entityId !== 'new') {
-      doFetch({
+      getCar({
         variables: {
           id: entityId // TODO dynamic id field name
         }
       })
     }
-  }, [entityId]);
+  }, [entityId, getCar]);
 
   useEffect(() => {
-    if (store.formRef.current != null && !loading && error == null && data != null) {
+    if (store.formRef.current != null && !queryLoading && queryError == null && carData != null) {
       form.setFieldsValue(jmix2ant<Car>(
-        data.carById,
+        carData.carById,
         Car.NAME,
         mainStore.metadata
       ));
     }
-  }, [store.formRef.current, loading, error, data]);
+  }, [queryLoading, queryError, carData, form, mainStore.metadata, store.formRef]);
 
   const handleFinishFailed = useCallback(() => {
     message.error(
@@ -214,12 +226,11 @@ const CarEdit = (props: Props) => {
   const handleFinish = useCallback(
     (values: { [field: string]: any }) => {
       if (form != null && mainStore.metadata != null) {
-        console.log('values', values);
         upsertCar({
           variables: {
             car: {
               ...values,
-              ...addIdIfExistingEntity(entityId, mainStore.metadata)
+              ...addIdIfExistingEntity(entityId, mainStore.metadata) // This will be refactored once we move to separate create/update mutations
             }
           }
         }).then(({errors}) => {
@@ -228,10 +239,12 @@ const CarEdit = (props: Props) => {
           } else {
             console.error(errors); // TODO Error handling
           }
+        }).catch(e => {
+          console.error(e);
         });
       }
     },
-    []
+    [entityId, form, mainStore.metadata, store.updated, upsertCar]
   );
 
   return useObserver(() => {
@@ -239,18 +252,18 @@ const CarEdit = (props: Props) => {
       return <Redirect to={PATH} />;
     }
 
-    if (loading) {
+    if (queryLoading) {
       return <Spinner />;
     }
 
-    if (error != null) {
-      console.error(error);
+    if (queryError != null) {
+      console.error(queryError);
       return (
         <>
           <FormattedMessage id="common.requestFailed" />.
           <br />
           <br />
-          <Button htmlType="button" onClick={() => doFetch()}>
+          <Button htmlType="button" onClick={() => getCar()}>
             <FormattedMessage id="common.retry" />
           </Button>
         </>
@@ -418,7 +431,7 @@ const CarEdit = (props: Props) => {
               type="primary"
               htmlType="submit"
               // disabled={status !== "DONE" && status !== "ERROR"} TODO Client-side validation
-              loading={loading}
+              loading={upsertLoading}
               style={{ marginLeft: "8px" }}
             >
               <FormattedMessage id="common.submit" />
@@ -438,7 +451,6 @@ function addIdIfExistingEntity(entityId: string, metadata: MetaClassInfo[]) {
 
 // TODO get rid of any and !
 // TODO move to react-ui
-// TODO will get metadata via graphql in future?
 function jmix2ant<T>(
   item: Record<string, any>,
   entityName: string,

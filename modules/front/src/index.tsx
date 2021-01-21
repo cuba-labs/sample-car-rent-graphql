@@ -15,7 +15,7 @@ import "./index.css";
 import { antdLocaleMapping, messagesMapping } from "./i18n/i18nMappings";
 import "moment/locale/ru";
 import "moment/locale/fr";
-import {ApolloClient, ApolloProvider, InMemoryCache} from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
 import { createApolloClient } from "./gql";
 
 export const cubaREST = initializeApp({

@@ -60,9 +60,8 @@ const CarList = (props: Props) => {
     doFetch({
       variables: toLimitAndOffset(paginationConfig)
     });
-  }, [paginationConfig]);
+  }, [paginationConfig, doFetch]);
 
-  // TODO deletion mutation
   const showDeletionDialog = useCallback(
     (e: SerializedEntity<Car>) => {
       console.log('e', e);
